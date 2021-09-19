@@ -1,5 +1,9 @@
 #!/usr/local/bin/python3
 
+# Wordsearch
+# By Pat Jensen
+# License: BSD-2-Clause
+
 import os
 import sys
 import random
@@ -303,8 +307,15 @@ def Main(window):
                                  mask)
   
   height, width = window.getmaxyx()
-  startrow = 12 
-  startcol = 32
+  curses.curs_set(0)
+  curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
+  window.bkgd(' ', curses.color_pair(1))
+
+  window.hline(0, 0, " ", width, curses.A_REVERSE)
+  window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
+
+  startrow = 3
+  startcol = 25
 
   for irow in range(nrows):
       puzrow = ' '.join(grid[irow])
@@ -313,8 +324,8 @@ def Main(window):
  
       #print(' '.join(grid[irow]))
   #show_grid_text(grid)
-  window.addstr(22, 0, "WORD LIST GOES HERE")
-  window.addstr(24, 0, "Controls: Press a key")
+  window.addstr(21, 31, "WORD LIST GOES HERE")
+  window.addstr(23, 0, "Controls: Press a key")
   key = window.getch()
 
 curses.wrapper(Main)
