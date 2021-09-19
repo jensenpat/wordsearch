@@ -9,6 +9,7 @@ import sys
 import random
 from copy import deepcopy
 import curses
+from curses.textpad import rectangle
 
 # Maximum number of rows and columns.
 NMAX = 32
@@ -313,9 +314,12 @@ def Main(window):
 
   window.hline(0, 0, " ", width, curses.A_REVERSE)
   window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
+  window.addstr(0, 70, "Score: 0", curses.A_REVERSE)
 
   startrow = 3
   startcol = 25
+  
+  rectangle(window, 2, 24, 18, 54)
 
   for irow in range(nrows):
       puzrow = ' '.join(grid[irow])
@@ -324,9 +328,11 @@ def Main(window):
  
       #print(' '.join(grid[irow]))
   #show_grid_text(grid)
-  window.addstr(21, 31, "WORD LIST GOES HERE")
-  window.addstr(23, 0, "Controls: Press a key")
+
+  window.addstr(20, 30, "WORD LIST GOES HERE")
+  window.addstr(23, 0, "Arrow keys to navigate. Space: Select, Return: Clear, Q: Quit")
+
   key = window.getch()
 
 curses.wrapper(Main)
-print("got end")
+print("Thank you for playing wordsearch.")
