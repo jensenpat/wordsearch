@@ -246,6 +246,10 @@ def Main(window):
   while key != ord('q') and key != 27:
     if key == curses.KEY_UP:
       cy, cx = curses.getsyx()
+      if cy < 4:
+        curses.beep()
+        curses.beep()
+        curses.beep()
       try:
         window.move(cy-1, cx)
       except:
@@ -253,6 +257,10 @@ def Main(window):
         window.refresh()
     elif key == curses.KEY_DOWN:
       cy, cx = curses.getsyx()
+      if cy > 16:
+        curses.beep()
+        curses.beep()
+        curses.beep()
       try:
         window.move(cy+1, cx)
       except:
@@ -260,8 +268,10 @@ def Main(window):
         window.refresh()
     elif key == curses.KEY_LEFT:
       cy, cx = curses.getsyx()
-      if cy < 5:
-        break
+      if cx < 27:
+        curses.beep()
+        curses.beep()
+        curses.beep()
       try:
         window.move(cy, cx-2)
       except:
@@ -269,6 +279,10 @@ def Main(window):
         window.refresh()
     elif key == curses.KEY_RIGHT:
       cy, cx = curses.getsyx()
+      if cx > 52:
+        curses.beep()
+        curses.beep()
+        curses.beep()
       try:
         window.move(cy, cx+2)
       except:
