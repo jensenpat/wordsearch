@@ -194,6 +194,10 @@ def get_wordlist(wordlist_filename):
             wordlist.append(line)
     return wordlist
 
+def listToString(s): 
+    str1 = " " 
+    return (str1.join(s))
+
 def Main(window):
   mask = None
   wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
@@ -233,7 +237,9 @@ def Main(window):
   #show_grid_text(grid)
 
   # Render word hint list
-  window.addstr(20, 30, "WORD LIST GOES HERE")
+  # TODO: center me
+  wordlistdisp = listToString(wordlist)
+  window.addstr(20, 0, wordlistdisp.center(80, ' '))
 
   # Render navigational directions
   window.addstr(23, 0, "Arrow keys to navigate. Space: Select, Return: Clear, Q: Quit")
