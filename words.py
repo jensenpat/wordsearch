@@ -246,48 +246,36 @@ def Main(window):
   while key != ord('q') and key != 27:
     if key == curses.KEY_UP:
       cy, cx = curses.getsyx()
-      if cy < 4:
-        curses.beep()
-        curses.beep()
-        curses.beep()
-      try:
-        window.move(cy-1, cx)
-      except:
-        curses.beep()
-        window.refresh()
+      if not cy < 4:
+        try:
+          window.move(cy-1, cx)
+        except:
+          curses.beep()
+          window.refresh()
     elif key == curses.KEY_DOWN:
       cy, cx = curses.getsyx()
-      if cy > 16:
-        curses.beep()
-        curses.beep()
-        curses.beep()
-      try:
-        window.move(cy+1, cx)
-      except:
-        curses.beep()
-        window.refresh()
+      if not cy > 16:
+        try:
+          window.move(cy+1, cx)
+        except:
+          curses.beep()
+          window.refresh()
     elif key == curses.KEY_LEFT:
       cy, cx = curses.getsyx()
-      if cx < 27:
-        curses.beep()
-        curses.beep()
-        curses.beep()
-      try:
-        window.move(cy, cx-2)
-      except:
-        curses.beep()
-        window.refresh()
+      if not cx < 27:
+        try:
+          window.move(cy, cx-2)
+        except:
+          curses.beep()
+          window.refresh()
     elif key == curses.KEY_RIGHT:
       cy, cx = curses.getsyx()
-      if cx > 52:
-        curses.beep()
-        curses.beep()
-        curses.beep()
-      try:
-        window.move(cy, cx+2)
-      except:
-        curses.beep()
-        window.refresh()
+      if not cx > 52:
+        try:
+          window.move(cy, cx+2)
+        except:
+          curses.beep()
+          window.refresh()
 
     key = window.getch()
 
