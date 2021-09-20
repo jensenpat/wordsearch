@@ -227,6 +227,8 @@ def Main(window):
   # Render word search surface
   startrow = 3
   startcol = 25
+  scoreword = ''
+
   for irow in range(nrows):
     puzrow = ' '.join(grid[irow])
     window.addstr(startrow, startcol, puzrow);
@@ -277,7 +279,19 @@ def Main(window):
         except:
           curses.beep()
           window.refresh()
+    elif key == ord(' '):    # space bar
+      cy, cx = curses.getsyx()			# get y/x
 
+      scorechar = window.inch(cy, cx)		# get char under cursor
+
+      #scoreword = ''.join(scorechar)	# add char into string
+
+      window.addstr(2, 0, str(type(scorechar)))		# show current word status
+
+      window.addch(cy, cx, scorechar, curses.A_REVERSE)		# highlight char 
+      window.move(cy, cx)			# move back on board
+      curses.beep()				# beep
+      
     key = window.getch()
 
 curses.wrapper(Main)
