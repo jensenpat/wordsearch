@@ -7,8 +7,8 @@
 import os
 import sys
 import random
-from copy import deepcopy
 import curses
+from copy import deepcopy
 from curses.textpad import rectangle
 
 # Maximum number of rows and columns.
@@ -166,7 +166,6 @@ def make_wordsearch(*args, **kwargs):
           .format(NATTEMPTS))
     return None, None
 
-
 def show_grid_text(grid):
     """Output a text version of the filled grid wordsearch."""
     for irow in range(nrows):
@@ -182,7 +181,6 @@ def show_wordsearch_text(grid, wordlist):
     show_grid_text(grid)
     print()
     show_wordlist_text(wordlist)
-
 
 def svg_preamble(fo, width, height):
     """Output the SVG preamble, with styles, to open file object fo."""
@@ -289,16 +287,12 @@ def get_wordlist(wordlist_filename):
             wordlist.append(line)
     return wordlist
 
-# Read the wordlist filename and grid dimensions (nrows, ncols) from the
-# command line.
-#wordlist_filename = sys.argv[1]
-#nrows, ncols = int(sys.argv[2]), int(sys.argv[3])
-
 def Main(window):
   mask = None
   wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
                   reverse=True)
   max_word_len = max(nrows, ncols)
+ 
   if max(len(word) for word in wordlist) > max_word_len:
     raise ValueError('Word list contains a word with too many letters.'
                      'The maximum is {}'.format(max(nrows, ncols)))
@@ -316,10 +310,12 @@ def Main(window):
   window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
   window.addstr(0, 70, "Score: 0", curses.A_REVERSE)
 
+  # Draw puzzle box
+  rectangle(window, 2, 24, 18, 54)
+ 
+  # Render puzzle surface
   startrow = 3
   startcol = 25
-  
-  rectangle(window, 2, 24, 18, 54)
 
   for irow in range(nrows):
       puzrow = ' '.join(grid[irow])
@@ -329,10 +325,16 @@ def Main(window):
       #print(' '.join(grid[irow]))
   #show_grid_text(grid)
 
+  # Render word hint list
   window.addstr(20, 30, "WORD LIST GOES HERE")
+
+  # Render navigational directions
   window.addstr(23, 0, "Arrow keys to navigate. Space: Select, Return: Clear, Q: Quit")
+
+  # Move on to puzzle surface
   window.move(10, 37)
-  
+ 
+  # Main event loop 
   key = window.getch()
   while key != ord('q') and key != 27:
     if key == curses.KEY_UP:
@@ -351,6 +353,8 @@ def Main(window):
         window.refresh()
     elif key == curses.KEY_LEFT:
       cy, cx = curses.getsyx()
+      if cy < 5:
+        break
       try:
         window.move(cy, cx-2)
       except:
@@ -367,4 +371,5 @@ def Main(window):
     key = window.getch()
 
 curses.wrapper(Main)
+
 print("Thank you for playing wordsearch.")
