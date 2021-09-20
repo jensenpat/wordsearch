@@ -221,25 +221,20 @@ def Main(window):
   window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
   window.addstr(0, 70, "Score: 0", curses.A_REVERSE)
 
-  # Draw puzzle box
+  # Draw search box
   rectangle(window, 2, 24, 18, 54)
  
-  # Render puzzle surface
+  # Render word search surface
   startrow = 3
   startcol = 25
-
   for irow in range(nrows):
-      puzrow = ' '.join(grid[irow])
-      window.addstr(startrow, startcol, puzrow);
-      startrow = startrow + 1
+    puzrow = ' '.join(grid[irow])
+    window.addstr(startrow, startcol, puzrow);
+    startrow = startrow + 1
  
-      #print(' '.join(grid[irow]))
-  #show_grid_text(grid)
-
   # Render word hint list
-  # TODO: center me
   wordlistdisp = listToString(wordlist)
-  window.addstr(20, 0, wordlistdisp.center(80, ' '))
+  window.addstr(20, 0, wordlistdisp.center(width, ' '))
 
   # Render navigational directions
   window.addstr(23, 0, "Arrow keys to navigate. Space: Select, Return: Clear, Q: Quit")
