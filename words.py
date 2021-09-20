@@ -308,7 +308,7 @@ def Main(window):
                                  mask)
   
   height, width = window.getmaxyx()
-  curses.curs_set(0)
+  curses.curs_set(2)
   curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
   window.bkgd(' ', curses.color_pair(1))
 
@@ -331,8 +331,40 @@ def Main(window):
 
   window.addstr(20, 30, "WORD LIST GOES HERE")
   window.addstr(23, 0, "Arrow keys to navigate. Space: Select, Return: Clear, Q: Quit")
-
+  window.move(10, 37)
+  
   key = window.getch()
+  while key != ord('q') and key != 27:
+    if key == curses.KEY_UP:
+      cy, cx = curses.getsyx()
+      try:
+        window.move(cy-1, cx)
+      except:
+        curses.beep()
+        window.refresh()
+    elif key == curses.KEY_DOWN:
+      cy, cx = curses.getsyx()
+      try:
+        window.move(cy+1, cx)
+      except:
+        curses.beep()
+        window.refresh()
+    elif key == curses.KEY_LEFT:
+      cy, cx = curses.getsyx()
+      try:
+        window.move(cy, cx-2)
+      except:
+        curses.beep()
+        window.refresh()
+    elif key == curses.KEY_RIGHT:
+      cy, cx = curses.getsyx()
+      try:
+        window.move(cy, cx+2)
+      except:
+        curses.beep()
+        window.refresh()
+
+    key = window.getch()
 
 curses.wrapper(Main)
 print("Thank you for playing wordsearch.")
