@@ -218,6 +218,9 @@ def Main(window):
   window.bkgd(' ', curses.color_pair(1))
 
   window.hline(0, 0, " ", width, curses.A_REVERSE)
+
+  category = wordlist_filename.replace(".txt", "")
+  window.addstr(0, 0, category.center(width, ' '), curses.A_REVERSE)
   window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
   window.addstr(0, 70, "Score: 0", curses.A_REVERSE)
 
