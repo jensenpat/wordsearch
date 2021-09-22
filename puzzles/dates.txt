@@ -1,0 +1,9 @@
+dinner
+dessert
+movies
+arcade
+minigolf
+bowling
+concert
+winery
+dancing

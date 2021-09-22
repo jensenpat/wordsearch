@@ -1,0 +1,9 @@
+bear
+tiger
+zebra
+lion
+lemur
+raccoon
+possum
+squirrel
+wolf

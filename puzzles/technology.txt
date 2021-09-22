@@ -1,0 +1,9 @@
+computer
+cellphone
+watch
+tablet
+streaming
+solar
+assistant
+gaming
+internet

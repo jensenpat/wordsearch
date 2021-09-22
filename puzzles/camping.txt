@@ -1,0 +1,9 @@
+tent
+blanket
+icechest
+firewood
+kettle
+hotdog
+smores
+friends
+bugspray

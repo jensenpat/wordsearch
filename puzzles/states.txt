@@ -1,0 +1,9 @@
+california
+oregon
+washington
+utah
+colorado
+hawaii
+idaho
+florida
+kentucky

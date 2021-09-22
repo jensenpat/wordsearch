@@ -1,0 +1,9 @@
+americano
+cappucino
+latte
+espresso
+macchiato
+mocha
+affogato
+mazagran
+black

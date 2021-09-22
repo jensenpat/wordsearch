@@ -1,0 +1,9 @@
+hotel
+airplane
+luggage
+train
+ticket
+passport
+jetlag
+expense
+explore

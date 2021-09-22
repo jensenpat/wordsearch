@@ -1,0 +1,9 @@
+chair
+couch
+table
+blender
+vacuum
+broom
+recliner
+plates
+blanket

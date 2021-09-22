@@ -1,0 +1,9 @@
+beach
+mountains
+park
+mueseum
+garden
+lake
+forest
+desert
+river
