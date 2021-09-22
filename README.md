@@ -1,4 +1,6 @@
 # wordsearch
 
 Relax with a classic word search game that you can play in your terminal.
-<img width="1242" alt="wordsearch" src="https://user-images.githubusercontent.com/84298137/134200099-b836a87c-d194-4afe-8e44-988b73230246.png">
+![wordsearch](https://user-images.githubusercontent.com/84298137/134269685-8200d788-99aa-4a4c-be66-acda4c332bd3.jpg)
+
+Supported Platforms: NetBSD, FreeBSD, Linux, MacOS, Windows 10
