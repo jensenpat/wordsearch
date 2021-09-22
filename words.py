@@ -218,6 +218,9 @@ def Main(window):
   width = 80
   height = 24
 
+  # Set up coordinates to track completed words
+  co1 = set()
+
   curses.curs_set(2)
   curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
   window.bkgd(' ', curses.color_pair(1))
@@ -288,14 +291,33 @@ def Main(window):
           window.refresh()
     elif key == curses.KEY_RESIZE:
       window.refresh()
+
+    # Return to wipe
+    elif key == 10:
+      cy, cx = curses.getsyx()
+      for cord in co1:
+        wipechar = window.instr(cord[0], cord[1], 1)
+        window.addch(cord[0], cord[1], wipechar)
+      # FIXME: dont we need to delete the solved coords too?
+      window.addstr(10, 60, "                 ")
+      scoreword = ''
+      window.move(cy, cx)  
+
+    # Space to score
     elif key == ord(' '):    # space bar
       cy, cx = curses.getsyx()			# get y/x
 
+      # Add coords for each letter we are adding
+      co1.add((cy, cx))
+      # window.addstr(11, 60, str(co1))
+
+      # Find cursor and see if we have character match
       scorechar = window.instr(cy, cx, 1)		# get char under cursor
       scoredecode = scorechar.decode("utf-8")
       scoreword = ''.join([scoreword, scoredecode])
       window.addstr(10, 60, scoreword)
 
+      # Now let's check for a word match
       for word in wordlist:
         if (word == scoreword):
           # Increase score based on number of chars
