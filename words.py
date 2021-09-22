@@ -204,6 +204,7 @@ def Main(window):
                   reverse=True)
   max_word_len = max(nrows, ncols)
   scoreword = ''
+  score = 0
  
   if max(len(word) for word in wordlist) > max_word_len:
     raise ValueError('Word list contains a word with too many letters.'
@@ -290,7 +291,16 @@ def Main(window):
       scoreword = ''.join([scoreword, scoredecode])
       window.addstr(10, 60, scoreword)
 
-      # call something to score comparison
+      for word in wordlist:
+        if (word == scoreword):
+          score = score + len(word)
+          scoretext = "Score: " + str(score)
+          sx = width - 9
+          sx = sx - len(str(score))
+          window.addstr(0, sx, scoretext, curses.A_REVERSE)
+
+          window.addstr(10, 60, "                 ")
+          scoreword = '' 
 
       window.addch(cy, cx, scorechar, curses.A_REVERSE)	 # highlight char 
       window.move(cy, cx)			# move back on board
