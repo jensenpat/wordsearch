@@ -1,0 +1,10 @@
+tandy
+compaq
+gateway
+dell
+hewlett
+packard
+apple
+ibmpc
+sunmicro
+emachine

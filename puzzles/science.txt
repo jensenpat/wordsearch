@@ -1,0 +1,9 @@
+astronomy
+biology
+chemistry
+medicine
+logic
+mathematics
+geology
+physics
+zoology

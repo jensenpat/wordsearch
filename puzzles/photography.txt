@@ -1,0 +1,9 @@
+focus
+shutter
+depth
+macro
+astro
+viewfinder
+lenses
+lighting
+zoom

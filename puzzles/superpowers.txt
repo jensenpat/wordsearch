@@ -1,0 +1,9 @@
+flying
+strength
+vision
+lightning
+hammer
+mental
+giant
+rocky
+magnetic

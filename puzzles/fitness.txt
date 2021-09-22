@@ -1,0 +1,9 @@
+weights
+running
+hiking
+biking
+cardio
+stretch
+warmup
+restday
+yoga
