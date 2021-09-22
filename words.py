@@ -203,6 +203,7 @@ def Main(window):
   wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
                   reverse=True)
   max_word_len = max(nrows, ncols)
+  scoreword = ''
  
   if max(len(word) for word in wordlist) > max_word_len:
     raise ValueError('Word list contains a word with too many letters.'
@@ -230,7 +231,6 @@ def Main(window):
   # Render word search surface
   startrow = 3
   startcol = 25
-  scoreword = ''
 
   for irow in range(nrows):
     puzrow = ' '.join(grid[irow])
@@ -285,13 +285,14 @@ def Main(window):
     elif key == ord(' '):    # space bar
       cy, cx = curses.getsyx()			# get y/x
 
-      scorechar = window.inch(cy, cx)		# get char under cursor
+      scorechar = window.instr(cy, cx, 1)		# get char under cursor
+      scoredecode = scorechar.decode("utf-8")
+      scoreword = ''.join([scoreword, scoredecode])
+      window.addstr(10, 60, scoreword)
 
-      #scoreword = ''.join(scorechar)	# add char into string
+      # call something to score comparison
 
-      window.addstr(2, 0, str(type(scorechar)))		# show current word status
-
-      window.addch(cy, cx, scorechar, curses.A_REVERSE)		# highlight char 
+      window.addch(cy, cx, scorechar, curses.A_REVERSE)	 # highlight char 
       window.move(cy, cx)			# move back on board
       curses.beep()				# beep
       
