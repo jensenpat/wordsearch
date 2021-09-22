@@ -214,7 +214,10 @@ def Main(window):
   grid, solution = make_wordsearch(nrows, ncols, wordlist, allow_backwards_words,
                                  mask)
   
-  height, width = window.getmaxyx()
+  #height, width = window.getmaxyx()
+  width = 80
+  height = 24
+
   curses.curs_set(2)
   curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
   window.bkgd(' ', curses.color_pair(1))
@@ -283,6 +286,8 @@ def Main(window):
         except:
           curses.beep()
           window.refresh()
+    elif key == curses.KEY_RESIZE:
+      window.refresh()
     elif key == ord(' '):    # space bar
       cy, cx = curses.getsyx()			# get y/x
 
@@ -293,14 +298,23 @@ def Main(window):
 
       for word in wordlist:
         if (word == scoreword):
-          score = score + len(word)
+          # Increase score based on number of chars
+          score = score + len(word)	
+
+          # Render new score
           scoretext = "Score: " + str(score)
           sx = width - 9
           sx = sx - len(str(score))
           window.addstr(0, sx, scoretext, curses.A_REVERSE)
 
-          window.addstr(10, 60, "                 ")
-          scoreword = '' 
+          # Reset settings for next word and clear buffer
+          window.addstr(10, 60, "                 ") 
+          scoreword = ''
+          
+          # Clear word from word list and redraw word list 
+          wordlist.remove(word)
+          wordlistdisp = listToString(wordlist)
+          window.addstr(20, 0, wordlistdisp.center(width, ' '))
 
       window.addch(cy, cx, scorechar, curses.A_REVERSE)	 # highlight char 
       window.move(cy, cx)			# move back on board
