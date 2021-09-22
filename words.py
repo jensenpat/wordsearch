@@ -200,11 +200,16 @@ def listToString(s):
 
 def Main(window):
   mask = None
-  wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
-                  reverse=True)
   max_word_len = max(nrows, ncols)
   scoreword = ''
   score = 0
+
+  # Puzzle picker
+  wordlist_filename = "/usr/local/share/wordsearch/" + ''.join(random.choice(os.listdir("puzzles/")))
+  print("puzzle: " + wordlist_filename)
+
+  wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
+                  reverse=True)
  
   if max(len(word) for word in wordlist) > max_word_len:
     raise ValueError('Word list contains a word with too many letters.'
