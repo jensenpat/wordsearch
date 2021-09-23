@@ -16,7 +16,6 @@ NMAX = 32
 alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 nrows = 15
 ncols = 15
-wordlist_filename = "planets.txt"
 
 def circle_mask(grid):
     """A circular mask to shape the grid."""
@@ -206,7 +205,7 @@ def Main(window):
 
   # Puzzle picker
   wordlist_filename = "/usr/local/share/wordsearch/" + ''.join(random.choice(os.listdir("puzzles/")))
-  print("puzzle: " + wordlist_filename)
+  # print("puzzle: " + wordlist_filename)
 
   wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
                   reverse=True)
@@ -343,6 +342,13 @@ def Main(window):
           wordlistdisp = listToString(wordlist)
           window.addstr(20, 0, wordlistdisp.center(width, ' '))
 
+          # Did we win?
+          if not wordlist:
+            winstr = "Congratulations! Press any key for a new game."
+            window.addstr(20, 0, winstr.center(width, ' '))
+            key = window.getch()
+            Main(window)
+	
       window.addch(cy, cx, scorechar, curses.A_REVERSE)	 # highlight char 
       window.move(cy, cx)			# move back on board
       curses.beep()				# beep
