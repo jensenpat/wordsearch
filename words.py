@@ -222,15 +222,17 @@ def Main(window):
   width = 80
   height = 24
 
-  # Set up coordinates to track completed words
-  co1 = set()
+  # Set up coordinates to track scoring and completed words
+  ScoreList = set()
+  CompletedList = []
 
+  # Initialize curses
   curses.curs_set(2)
   curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
   window.bkgd(' ', curses.color_pair(1))
 
+  # Render background UX
   window.hline(0, 0, " ", width, curses.A_REVERSE)
-
   category = wordlist_filename.replace(".txt", "")
   window.addstr(0, 0, category.center(width, ' '), curses.A_REVERSE)
   window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
@@ -299,10 +301,14 @@ def Main(window):
     # Return to wipe
     elif key == 10:
       cy, cx = curses.getsyx()
-      for cord in co1:
-        wipechar = window.instr(cord[0], cord[1], 1)
-        window.addch(cord[0], cord[1], wipechar)
+
+      # Check scored coordinates to make sure we dont wipe completed items
+      for cord in ScoreList:
+       if cord not in CompletedList: 
+          wipechar = window.instr(cord[0], cord[1], 1)
+          window.addch(cord[0], cord[1], wipechar)
       # FIXME: dont we need to delete the solved coords too?
+
       window.addstr(10, 60, "                 ")
       scoreword = ''
       window.move(cy, cx)  
@@ -312,8 +318,8 @@ def Main(window):
       cy, cx = curses.getsyx()			# get y/x
 
       # Add coords for each letter we are adding
-      co1.add((cy, cx))
-      # window.addstr(11, 60, str(co1))
+      ScoreList.add((cy, cx))
+      # window.addstr(11, 60, str(ScoreList))
 
       # Find cursor and see if we have character match
       scorechar = window.instr(cy, cx, 1)		# get char under cursor
@@ -336,7 +342,13 @@ def Main(window):
           # Reset settings for next word and clear buffer
           window.addstr(10, 60, "                 ") 
           scoreword = ''
-          
+         
+          # Let's remember the coords for this set
+          CompletedList.append(ScoreList)
+  
+          # Reset the scoring list
+          ScoreList.clear()
+ 
           # Clear word from word list and redraw word list 
           wordlist.remove(word)
           wordlistdisp = listToString(wordlist)
