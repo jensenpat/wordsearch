@@ -1,0 +1,9 @@
+jumbo
+passenger
+light
+turboprop
+cargo
+business
+military
+private
+aerobatic
