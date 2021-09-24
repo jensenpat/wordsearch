@@ -1,0 +1,9 @@
+acorn
+almond
+brazil
+cashew
+chestnut
+hazelnut
+hickory
+macadamia
+peanut

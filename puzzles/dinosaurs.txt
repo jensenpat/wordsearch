@@ -1,0 +1,9 @@
+tyrannosaur
+sauropod
+ceratopsian
+raptor
+theropod
+titanosaur
+ankylosaur
+hadrosaur
+ornithopod
