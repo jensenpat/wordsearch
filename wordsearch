@@ -308,6 +308,7 @@ def Main(window):
           wipechar = window.instr(cord[0], cord[1], 1)
           window.addch(cord[0], cord[1], wipechar)
 
+      ScoreList.clear()
       window.addstr(10, 60, "                 ")
       scoreword = ''
       window.move(cy, cx)  
@@ -315,6 +316,21 @@ def Main(window):
     # Space to score
     elif key == ord(' '):    # space bar
       cy, cx = curses.getsyx()			# get y/x
+
+      # Check for existing ScoreList, then check if we are y +/- 1, or x +/- 2 away
+      if ScoreList:
+        for cord in ScoreList:
+          if (cy > cord[0] + 1) or (cy < cord[0] - 1): 
+            lp = ("CY not adjacent. coords match: y: " + str(cord[0]) + "x: " + str(cord[1]))
+            window.addstr(13, 61, lp)
+          if (cx > cord[1] + 2) or (cx < cord[1] - 2): 
+            lp = ("CX not adjacent. coords match: y: " + str(cord[0]) + "x: " + str(cord[1]))
+            window.addstr(14, 61, lp)
+            
+        lp = "y: " + str(cy) + " x:" + str(cx) + " len:" + str(len(ScoreList)) + "     "
+        window.addstr(11, 61, lp)
+        lp = "cyx: " + str(cord[0]) + " " + str(cord[1]) + "    "
+        window.addstr(12, 61, lp)
 
       # Add coords for each letter we are adding
       ScoreList.add((cy, cx))
