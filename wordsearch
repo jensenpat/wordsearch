@@ -204,7 +204,7 @@ def Main(window):
   score = 0
 
   # Puzzle picker
-  wordlist_filename = "/usr/local/share/wordsearch/" + ''.join(random.choice(os.listdir("puzzles/")))
+  wordlist_filename = '/usr/local/share/wordsearch/' + ''.join(random.choice(os.listdir("/usr/local/share/wordsearch/")))
   # print("puzzle: " + wordlist_filename)
 
   wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
@@ -319,13 +319,13 @@ def Main(window):
 
       # Check for existing ScoreList, then check if we are y +/- 1, or x +/- 2 away
       if ScoreList:
-        for cord in ScoreList:
-          if (cy > cord[0] + 1) or (cy < cord[0] - 1): 
-            lp = ("CY not adjacent. coords match: y: " + str(cord[0]) + "x: " + str(cord[1]))
-            window.addstr(13, 61, lp)
-          if (cx > cord[1] + 2) or (cx < cord[1] - 2): 
-            lp = ("CX not adjacent. coords match: y: " + str(cord[0]) + "x: " + str(cord[1]))
-            window.addstr(14, 61, lp)
+        #for cord in ScoreList:
+        if (cy > ScoreList[-2] + 1) or (cy < ScoreList[-2] - 1): 
+          lp = ("CY not adjacent. coords match: y: " + str(ScoreList[-2]) + "x: " + str(ScoreList[-1]))
+          window.addstr(13, 61, lp)
+        if (cx > ScoreList[-1] + 2) or (cx < ScoreList[-1] - 2): 
+          lp = ("CX not adjacent. coords match: y: " + str(ScoreList[-2]) + "x: " + str(ScoreList[-1]))
+          window.addstr(14, 61, lp)
             
         lp = "y: " + str(cy) + " x:" + str(cx) + " len:" + str(len(ScoreList)) + "     "
         window.addstr(11, 61, lp)
