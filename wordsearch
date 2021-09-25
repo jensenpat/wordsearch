@@ -197,6 +197,13 @@ def listToString(s):
     str1 = " " 
     return (str1.join(s))
 
+def adjac(ele, sub = []):
+  if not ele:
+     yield sub
+  else:
+     yield from [idx for j in range(ele[0] - 1, ele[0] + 2)
+                for idx in adjac(ele[1:], sub + [j])]
+
 def Main(window):
   mask = None
   max_word_len = max(nrows, ncols)
@@ -223,7 +230,7 @@ def Main(window):
   height = 24
 
   # Set up coordinates to track scoring and completed words
-  ScoreList = set()
+  ScoreList = []
   CompletedList = []
 
   # Initialize curses
@@ -316,24 +323,22 @@ def Main(window):
     # Space to score
     elif key == ord(' '):    # space bar
       cy, cx = curses.getsyx()			# get y/x
+      cur = [(cy, cx)]
 
       # Check for existing ScoreList, then check if we are y +/- 1, or x +/- 2 away
       if ScoreList:
-        #for cord in ScoreList:
-        if (cy > ScoreList[-2] + 1) or (cy < ScoreList[-2] - 1): 
-          lp = ("CY not adjacent. coords match: y: " + str(ScoreList[-2]) + "x: " + str(ScoreList[-1]))
-          window.addstr(13, 61, lp)
-        if (cx > ScoreList[-1] + 2) or (cx < ScoreList[-1] - 2): 
-          lp = ("CX not adjacent. coords match: y: " + str(ScoreList[-2]) + "x: " + str(ScoreList[-1]))
-          window.addstr(14, 61, lp)
-            
-        lp = "y: " + str(cy) + " x:" + str(cx) + " len:" + str(len(ScoreList)) + "     "
-        window.addstr(11, 61, lp)
-        lp = "cyx: " + str(cord[0]) + " " + str(cord[1]) + "    "
-        window.addstr(12, 61, lp)
+        sly = ScoreList[-1][0]
+        slx = ScoreList[-1][1]
+
+        res = list(adjac(ScoreList[-1]))
+        for member in res:
+          if cur in member:
+            window.addstr(13, 60, "im adjacent")
+
+        window.addstr(11, 60, str(res))
 
       # Add coords for each letter we are adding
-      ScoreList.add((cy, cx))
+      ScoreList.append((cy, cx))
       # window.addstr(11, 60, str(ScoreList))
 
       # Find cursor and see if we have character match
