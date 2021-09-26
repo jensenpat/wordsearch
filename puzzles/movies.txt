@@ -1,0 +1,9 @@
+preview
+popcorn
+soda
+candy
+ticket
+attraction
+date
+theater
+projector

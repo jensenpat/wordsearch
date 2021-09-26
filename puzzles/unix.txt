@@ -1,0 +1,9 @@
+kernel
+source
+headers
+sysctl
+compiler
+config
+devices
+terminal
+shell

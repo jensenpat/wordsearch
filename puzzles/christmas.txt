@@ -1,0 +1,9 @@
+lights
+tree
+family
+santa
+celebration
+stocking
+wreath
+garland
+candles
