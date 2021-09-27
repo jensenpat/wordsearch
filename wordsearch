@@ -201,7 +201,7 @@ def adjac(ele, sub = []):
   if not ele:
      yield sub
   else:
-     yield from [idx for j in range(ele[0] - 1, ele[0] + 2)
+     yield from [idx for j in range(ele[0] - 1, ele[0] + 3)
                 for idx in adjac(ele[1:], sub + [j])]
 
 def Main(window):
@@ -230,6 +230,7 @@ def Main(window):
   height = 24
 
   # Set up coordinates to track scoring and completed words
+  adjacent = 0
   ScoreList = []
   CompletedList = []
 
@@ -315,6 +316,7 @@ def Main(window):
           wipechar = window.instr(cord[0], cord[1], 1)
           window.addch(cord[0], cord[1], wipechar)
 
+      # Clear scoreword and ScoreList to start over
       ScoreList.clear()
       window.addstr(10, 60, "                 ")
       scoreword = ''
@@ -323,19 +325,31 @@ def Main(window):
     # Space to score
     elif key == ord(' '):    # space bar
       cy, cx = curses.getsyx()			# get y/x
-      cur = [(cy, cx)]
+      cur = [cy, cx]
 
       # Check for existing ScoreList, then check if we are y +/- 1, or x +/- 2 away
       if ScoreList:
-        sly = ScoreList[-1][0]
-        slx = ScoreList[-1][1]
+      #  sly = ScoreList[-1][0]
+      #  slx = ScoreList[-1][1]
 
+        t1 = "cur: " + str(cur) + " " + "scorelist: " + str(ScoreList[-1])
+        window.addstr(12, 60, t1)
+
+        # Get list of adjacencies
         res = list(adjac(ScoreList[-1]))
-        for member in res:
-          if cur in member:
-            window.addstr(13, 60, "im adjacent")
 
-        window.addstr(11, 60, str(res))
+        for member in res:
+            if cur in res:
+              window.addstr(13, 60, "im adjacent    ")
+              adjacent = 1
+            else:
+              window.addstr(13, 60, "im NOT adjacent")
+              adjacent = 0
+              curses.beep()
+              curses.beep()
+              curses.beep()
+
+        window.addstr(14, 60, str(res))
 
       # Add coords for each letter we are adding
       ScoreList.append((cy, cx))
