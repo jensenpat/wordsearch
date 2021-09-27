@@ -1,7 +1,7 @@
 lemon
 strawberry
 orange
-passonfruit
+passionfruit
 grape
 banana
 apple
