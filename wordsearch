@@ -329,77 +329,75 @@ def Main(window):
 
       # Check for existing ScoreList, then check if we are y +/- 1, or x +/- 2 away
       if ScoreList:
-      #  sly = ScoreList[-1][0]
-      #  slx = ScoreList[-1][1]
-
-        t1 = "cur: " + str(cur) + " " + "scorelist: " + str(ScoreList[-1])
-        window.addstr(12, 60, t1)
+        #t1 = "cur: " + str(cur) + " " + "scorelist: " + str(ScoreList[-1])
+        #window.addstr(12, 60, t1)
 
         # Get list of adjacencies
         res = list(adjac(ScoreList[-1]))
 
         for member in res:
             if cur in res:
-              window.addstr(13, 60, "im adjacent    ")
+            #  window.addstr(13, 60, "im adjacent    ")
               adjacent = 1
             else:
-              window.addstr(13, 60, "im NOT adjacent")
+            #  window.addstr(13, 60, "im NOT adjacent")
               adjacent = 0
               curses.beep()
               curses.beep()
               curses.beep()
+      else:
+        adjacent = 1
 
-        window.addstr(14, 60, str(res))
+        #window.addstr(14, 60, str(res))
 
-      # Add coords for each letter we are adding
-      ScoreList.append((cy, cx))
-      # window.addstr(11, 60, str(ScoreList))
+      if adjacent == 1:
+        # Add coords for each letter we are adding
+        ScoreList.append((cy, cx))
+        # window.addstr(11, 60, str(ScoreList))
 
-      # Find cursor and see if we have character match
-      scorechar = window.instr(cy, cx, 1)		# get char under cursor
-      scoredecode = scorechar.decode("utf-8")
-      scoreword = ''.join([scoreword, scoredecode])
-      window.addstr(10, 60, scoreword)
+        # Find cursor and see if we have character match
+        scorechar = window.instr(cy, cx, 1)		# get char under cursor
+        scoredecode = scorechar.decode("utf-8")
+        scoreword = ''.join([scoreword, scoredecode])
+        window.addstr(10, 60, scoreword)
 
-      # Now let's check for a word match
-      for word in wordlist:
-        if (word == scoreword):
-          # Increase score based on number of chars
-          score = score + len(word)	
+        # Now let's check for a word match
+        for word in wordlist:
+          if (word == scoreword):
+            # Increase score based on number of chars
+            score = score + len(word)	
 
-          # Render new score
-          scoretext = "Score: " + str(score)
-          sx = width - 9
-          sx = sx - len(str(score))
-          window.addstr(0, sx, scoretext, curses.A_REVERSE)
+            # Render new score
+            scoretext = "Score: " + str(score)
+            sx = width - 9
+            sx = sx - len(str(score))
+            window.addstr(0, sx, scoretext, curses.A_REVERSE)
 
-          # Reset settings for next word and clear buffer
-          window.addstr(10, 60, "                 ") 
-          scoreword = ''
+            # Reset settings for next word and clear buffer
+            window.addstr(10, 60, "                 ") 
+            scoreword = ''
          
-          # Let's remember the coords for this set
-          CompletedList.append(ScoreList)
+            # Let's remember the coords for this set
+            CompletedList.append(ScoreList)
   
-          # Reset the scoring list
-          ScoreList.clear()
+            # Reset the scoring list
+            ScoreList.clear()
  
-          # Clear word from word list and redraw word list 
-          wordlist.remove(word)
-          wordlistdisp = listToString(wordlist)
-          window.addstr(20, 0, wordlistdisp.center(width, ' '))
+            # Clear word from word list and redraw word list 
+            wordlist.remove(word)
+            wordlistdisp = listToString(wordlist)
+            window.addstr(20, 0, wordlistdisp.center(width, ' '))
 
-          # Did we win?
-          if not wordlist:
-            winstr = "Congratulations! Press any key for a new game."
-            window.addstr(20, 0, winstr.center(width, ' '))
-            key = window.getch()
-            Main(window)
+            # Did we win?
+            if not wordlist:
+              winstr = "Congratulations! Press any key for a new game."
+              window.addstr(20, 0, winstr.center(width, ' '))
+              key = window.getch()
+              Main(window)
 	
-      window.addch(cy, cx, scorechar, curses.A_REVERSE)	 # highlight char 
-      window.move(cy, cx)			# move back on board
+        window.addch(cy, cx, scorechar, curses.A_REVERSE)	 # highlight char 
+        window.move(cy, cx)			# move back on board
       
     key = window.getch()
 
 curses.wrapper(Main)
-
-print("Thank you for playing wordsearch.")
