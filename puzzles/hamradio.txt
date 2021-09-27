@@ -1,0 +1,9 @@
+callsign
+spectrum
+antenna
+feedline
+safety
+station
+radiation
+signal
+propagate

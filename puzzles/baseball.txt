@@ -1,0 +1,9 @@
+diamond
+catcher
+inning
+fielder
+grounder
+outfield
+sacrifice
+slugger
+strikeout

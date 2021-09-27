@@ -1,0 +1,9 @@
+attachment
+header
+envelope
+address
+spam
+spoofing
+thread
+subject
+unicode

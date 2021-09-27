@@ -1,0 +1,9 @@
+galaxy
+gravity
+orbit
+meteor
+satellite
+planet
+rocket
+zenith
+eclipse

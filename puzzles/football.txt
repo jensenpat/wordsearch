@@ -1,0 +1,9 @@
+blitz
+fieldgoal
+forward
+fumble
+halftime
+intercept
+lateral
+safety
+tackle
