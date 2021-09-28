@@ -1,10 +1,10 @@
-ifeq ($(PREFIX),)
-	PREFIX = /usr/local
-endif
+PREFIX = /usr/local
 
 BIN_PATH = $(PREFIX)/bin
 MAN_PATH = $(PREFIX)/man
 SHARE_PATH = $(PREFIX)/share/wordsearch
+
+all: install
 
 install: wordsearch
 	install -m 555 wordsearch $(BIN_PATH)
