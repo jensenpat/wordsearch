@@ -232,12 +232,22 @@ def puzzlepicker():
 
   return wordlist_filename
 
+def check_size(window):
+  height, width = window.getmaxyx()
+  if not height > 23 or not width > 79:
+    curses.endwin()
+    print("wordsearch requires an 80-column terminal to play.")
+    print("You are " + str(width) + "x" + str(height))
+    print("If you are using a windowed or virtual terminal, please resize your window to larger then 80x24.")
+    exit()
+
 def Main(window):
   mask = None
   max_word_len = max(nrows, ncols)
   scoreword = ''
   score = 0
 
+  check_size(window) 
   wordlist_filename = puzzlepicker()
 
   wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
