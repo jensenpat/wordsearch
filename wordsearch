@@ -21,7 +21,7 @@
 import os
 import sys
 import random
-import curses
+import _curses,curses
 from copy import deepcopy
 from curses.textpad import rectangle
 
@@ -30,6 +30,8 @@ NMAX = 32
 alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 nrows = 15
 ncols = 15
+
+score = 0
 
 def circle_mask(grid):
     """A circular mask to shape the grid."""
@@ -259,7 +261,8 @@ def Main(window):
   mask = None
   max_word_len = max(nrows, ncols)
   scoreword = ''
-  score = 0
+  # score = 0
+  global score
 
   check_size(window) 
   wordlist_filename = puzzlepicker()
@@ -275,7 +278,6 @@ def Main(window):
   grid, solution = make_wordsearch(nrows, ncols, wordlist, allow_backwards_words,
                                  mask)
   
-  #height, width = window.getmaxyx()
   width = 80
   height = 24
 
@@ -294,7 +296,12 @@ def Main(window):
   category = wordlist_filename.replace(".txt", "")
   window.addstr(0, 0, category.center(width, ' '), curses.A_REVERSE)
   window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
-  window.addstr(0, 70, "Score: 0", curses.A_REVERSE)
+  # window.addstr(0, 70, "Score: 0", curses.A_REVERSE)
+  # Render new score
+  scoretext = "Score: " + str(score)
+  sx = width - 9
+  sx = sx - len(str(score))
+  window.addstr(0, sx, scoretext, curses.A_REVERSE)
 
   # Draw search box
   rectangle(window, 2, 24, 18, 54)
@@ -379,18 +386,13 @@ def Main(window):
 
       # Check for existing ScoreList, then check if we are y +/- 1, or x +/- 2 away
       if ScoreList:
-        #t1 = "cur: " + str(cur) + " " + "scorelist: " + str(ScoreList[-1])
-        #window.addstr(12, 60, t1)
-
         # Get list of adjacencies
         res = list(adjac(ScoreList[-1]))
 
         for member in res:
             if cur in res:
-            #  window.addstr(13, 60, "im adjacent    ")
               adjacent = 1
             else:
-            #  window.addstr(13, 60, "im NOT adjacent")
               adjacent = 0
               curses.beep()
               curses.beep()
@@ -398,12 +400,9 @@ def Main(window):
       else:
         adjacent = 1
 
-        #window.addstr(14, 60, str(res))
-
       if adjacent == 1:
         # Add coords for each letter we are adding
         ScoreList.append((cy, cx))
-        # window.addstr(11, 60, str(ScoreList))
 
         # Find cursor and see if we have character match
         scorechar = window.instr(cy, cx, 1)		# get char under cursor
