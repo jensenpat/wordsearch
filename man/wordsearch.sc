@@ -29,7 +29,11 @@ _Q or Escape key:_ Exit to the shell prompt
 # CONVENTIONS
 Each word search puzzle generally features up to 9 words that make up that category. 
 
-Puzzles are available as wordlists and are placed in _/usr/local/share/wordsearch_. 
+Puzzles are available as wordlists and can be placed in any of the following directories:
+
+_puzzles/_
+_/usr/local/share/wordsearch/_
+_/usr/pkg/share/wordsearch/_
 
 Puzzles can edited in your text editor. When *wordsearch* is started, it will select a random wordlist for each category during gameplay. 
 

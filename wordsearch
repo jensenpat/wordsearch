@@ -204,15 +204,41 @@ def adjac(ele, sub = []):
      yield from [idx for j in range(ele[0] - 1, ele[0] + 3)
                 for idx in adjac(ele[1:], sub + [j])]
 
+def puzzlepicker():
+  # Prefer local puzzles/ directory first, then try BSD paths
+  # /usr/local/share and /usr/pkg/share
+  picked = 0
+  wordlist_filename = ''
+
+  if (os.path.isdir("puzzles")):
+    wordlist_filename = 'puzzles/' + ''.join(random.choice(os.listdir("puzzles/")))
+    picked = 1
+
+  if (os.path.isdir("/usr/local/share/wordsearch")) and not picked == 1:
+    wordlist_filename = '/usr/local/share/wordsearch/' + ''.join(random.choice(os.listdir("/usr/local/share/wordsearch/")))
+    picked = 1
+  
+  if (os.path.isdir("/usr/pkg/share/wordsearch")) and not picked == 1:
+    wordlist_filename = '/usr/pkg/share/wordsearch/' + ''.join(random.choice(os.listdir("/usr/pkg/share/wordsearch/")))
+    picked = 1
+
+  if not wordlist_filename:
+    curses.endwin() 
+    print("Please make sure you have placed puzzle files in one of the following directories:")
+    print("puzzles/")
+    print("/usr/local/share/wordsearch/")
+    print("/usr/pkg/share/wordsearch/")
+    exit()
+
+  return wordlist_filename
+
 def Main(window):
   mask = None
   max_word_len = max(nrows, ncols)
   scoreword = ''
   score = 0
 
-  # Puzzle picker
-  wordlist_filename = '/usr/local/share/wordsearch/' + ''.join(random.choice(os.listdir("/usr/local/share/wordsearch/")))
-  # print("puzzle: " + wordlist_filename)
+  wordlist_filename = puzzlepicker()
 
   wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
                   reverse=True)
