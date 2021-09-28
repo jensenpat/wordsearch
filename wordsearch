@@ -21,7 +21,7 @@
 import os
 import sys
 import random
-import _curses,curses
+import curses
 from copy import deepcopy
 from curses.textpad import rectangle
 
@@ -282,6 +282,7 @@ def Main(window):
 
   # Set up coordinates to track scoring and completed words
   adjacent = 0
+  duplicate = 0
   ScoreList = []
   CompletedList = []
 
@@ -382,16 +383,18 @@ def Main(window):
     elif key == ord(' '):    # space bar
       cy, cx = curses.getsyx()			# get y/x
       cur = [cy, cx]
+      cur2 = (cy, cx)
+      duplicate = 0
 
       # Check for existing ScoreList, then check if we are y +/- 1, or x +/- 2 away
       if ScoreList:
         # Get list of adjacencies
         res = list(adjac(ScoreList[-1]))
-
+        
         for member in res:
-            if cur in res:
+          if cur in res:
               adjacent = 1
-            else:
+          else:
               adjacent = 0
               curses.beep()
               curses.beep()
@@ -399,7 +402,13 @@ def Main(window):
       else:
         adjacent = 1
 
-      if adjacent == 1:
+      # Check for existing ScoreList, then check if this character is in it already
+      if ScoreList:
+        if cur2 in ScoreList:
+          curses.beep()
+          duplicate = 1
+
+      if adjacent == 1 and not duplicate == 1:
         # Add coords for each letter we are adding
         ScoreList.append((cy, cx))
 
