@@ -1,0 +1,9 @@
+champagne
+merlot
+pinotnoir
+cabernet
+chardonnay
+moscato
+dessert
+sparkling
+pinotgrigio

@@ -1,0 +1,9 @@
+nutmeg
+curry
+cinnamon
+turmeric
+allspice
+cloves
+pepper
+paprika
+garlicsalt

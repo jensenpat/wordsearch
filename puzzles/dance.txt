@@ -1,0 +1,9 @@
+twirl
+ballet
+hiphop
+shoes
+leotard
+recital
+practice
+stretch
+costume
