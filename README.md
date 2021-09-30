@@ -10,6 +10,6 @@ Please copy the contents of the puzzle directory into /usr/local/share/wordsearc
 
 Feel free to create, add and contribute your own custom word searches!
 
-Supported Platforms: NetBSD, FreeBSD, Linux, MacOS, Windows 10
+Supported Platforms: FreeBSD, Linux, MacOS
 
 ![wordsearch](https://user-images.githubusercontent.com/84298137/134269853-260fcbbe-1276-4f64-ab54-b12414c09150.jpg)
