@@ -15,6 +15,14 @@ Once each word has been completed, the player will receive a score equal to the 
 
 After finishing a category, the player will be prompted to begin a new category, or the player can choose to exit the game.
 
+*wordsearch* supports the following command line arguments to customize gameplay:
+
+	*-t* 	Set a curses color theme for game play. These themes include: red, blue, green and black
+
+	*-h* 	Show wordsearch command line arguments
+
+	*-v* 	Show wordsearch version
+
 # COMMANDS
 Help is available on screen during gameplay. A description of available commands is below:
 
