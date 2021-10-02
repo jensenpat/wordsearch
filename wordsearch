@@ -294,7 +294,7 @@ def Main(window):
 
   # Theme picker
   if (theme == "green"):
-    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
   if (theme == "black"):
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
   if (theme == "red"):
