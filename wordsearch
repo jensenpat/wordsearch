@@ -370,7 +370,8 @@ def Main(window):
       # Check scored coordinates to make sure we dont wipe completed items
       for cord in ScoreList:
        if cord not in CompletedList: 
-          wipechar = window.instr(cord[0], cord[1], 1)
+          wipeint = window.inch(cord[0], cord[1])
+          wipechar = wipeint & 0xFF
           window.addch(cord[0], cord[1], wipechar)
 
       # Clear scoreword and ScoreList to start over
@@ -413,9 +414,9 @@ def Main(window):
         ScoreList.append((cy, cx))
 
         # Find cursor and see if we have character match
-        scorechar = window.instr(cy, cx, 1)		# get char under cursor
-        scoredecode = scorechar.decode("utf-8")
-        scoreword = ''.join([scoreword, scoredecode])
+        scoreint = window.inch(cy, cx)
+        scorechar = scoreint & 0xFF
+        scoreword = ''.join([scoreword, chr(scorechar)])
         window.addstr(10, 60, scoreword)
 
         # Now let's check for a word match
@@ -452,7 +453,7 @@ def Main(window):
               key = window.getch()
               Main(window)
 	
-        window.addch(cy, cx, scorechar, curses.A_REVERSE)	 # highlight char 
+        window.addstr(cy, cx, chr(scorechar), curses.A_REVERSE)	 # highlight char 
         window.move(cy, cx)			# move back on board
       
     key = window.getch()
