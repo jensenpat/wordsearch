@@ -342,7 +342,7 @@ def Main(window):
   # Main event loop 
   key = window.getch()
   while key != ord('q') and key != 27:
-    if key == curses.KEY_UP:
+    if key == curses.KEY_UP or key == ord('k'):
       cy, cx = curses.getsyx()
       if not cy < 4:
         try:
@@ -350,7 +350,7 @@ def Main(window):
         except:
           curses.beep()
           window.refresh()
-    elif key == curses.KEY_DOWN:
+    elif key == curses.KEY_DOWN or key == ord('j'):
       cy, cx = curses.getsyx()
       if not cy > 16:
         try:
@@ -358,7 +358,7 @@ def Main(window):
         except:
           curses.beep()
           window.refresh()
-    elif key == curses.KEY_LEFT:
+    elif key == curses.KEY_LEFT or key == ord('h'):
       cy, cx = curses.getsyx()
       if not cx < 27:
         try:
@@ -366,7 +366,7 @@ def Main(window):
         except:
           curses.beep()
           window.refresh()
-    elif key == curses.KEY_RIGHT:
+    elif key == curses.KEY_RIGHT or key == ord('l'):
       cy, cx = curses.getsyx()
       if not cx > 52:
         try:
@@ -472,8 +472,7 @@ def Main(window):
       
     key = window.getch()
 
-
-# initalize wordsearch
+# Initalize wordsearch
 opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
 args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
 
@@ -501,4 +500,5 @@ if "-h" in opts:
 if "-t" in opts:
   theme = sys.argv[2]
 
+# Start curses and go to main
 curses.wrapper(Main)
