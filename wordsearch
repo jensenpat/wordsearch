@@ -25,6 +25,8 @@ import curses
 from copy import deepcopy
 from curses.textpad import rectangle
 
+wsver = "1.3"
+
 # Maximum number of rows and columns.
 NMAX = 32
 alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -457,5 +459,34 @@ def Main(window):
         window.move(cy, cx)			# move back on board
       
     key = window.getch()
+
+
+# initalize wordsearch
+opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
+args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+
+if "-v" in opts:
+  print()
+  print(f"Wordsearch {wsver}")
+  print()
+  print("Copyright (c) 2021")
+  print("Pat Jensen (patj@passpackets.com)")
+  print("All rights reserved.")
+  print()
+  print("Redistribution and use in source and binary forms, with or without")
+  print("modification, are permitted provided that the following conditions are met:")
+  print()
+  print("1. Redistributions of source code must retain the above copyright notice, this")
+  print("   list of conditions and the following disclaimer.")
+  print()
+  print("2. Redistributions in binary form must reproduce the above copyright notice,")
+  print("   this list of conditions and the following disclaimer in the documentation")
+  print("   and/or other materials provided with the distribution.")
+  print()
+  exit()
+
+if "-h" in opts:
+  print(f"Usage: {sys.argv[0]} (-v | -h)")
+  exit()
 
 curses.wrapper(Main)
