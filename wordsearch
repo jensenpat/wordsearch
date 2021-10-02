@@ -466,11 +466,8 @@ opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
 args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
 
 if "-v" in opts:
-  print()
   print(f"Wordsearch {wsver}")
-  print()
-  print("Copyright (c) 2021")
-  print("Pat Jensen (patj@passpackets.com)")
+  print("Copyright (c) 2021 Pat Jensen")
   print("All rights reserved.")
   print()
   print("Redistribution and use in source and binary forms, with or without")
