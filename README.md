@@ -7,11 +7,17 @@ Based on a printable word search page generator by Christian Hill (https://scipy
 Features:
 
 Plays on your favorite operating systems
+
 Full screen curses-based ANSI gameplay
+
 Use your arrow keys to navigate or you can use vi keys as well (hjkl)
+
 65 fun word search puzzles packed with nostalgia
+
 Color themes: pick what is easy on your eyes (red, green, blue and black)
+
 It's simple to create your own puzzles in your favorite text editor
+
 Word based scoring so you can relax without chasing a timer
 
 Getting Started:
