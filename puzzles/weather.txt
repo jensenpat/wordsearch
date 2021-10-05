@@ -1,0 +1,9 @@
+barometer
+cirrus
+dewpoint
+forecast
+landfall
+humidity
+typhoon
+thermal
+windsock

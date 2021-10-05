@@ -1,0 +1,9 @@
+seeds
+chips
+crackers
+cookies
+cheese
+trailmix
+jerky
+fruit
+popcorn
