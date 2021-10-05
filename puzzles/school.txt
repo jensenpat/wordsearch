@@ -1,0 +1,9 @@
+backpack
+quiz
+classroom
+teacher
+vacation
+recess
+summer
+parties
+fieldtrip
