@@ -1,0 +1,9 @@
+pepperoni
+sausage
+olives
+mushrooms
+bellpeppers
+salami
+cheese
+pineapple
+ham

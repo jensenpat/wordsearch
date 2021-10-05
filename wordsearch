@@ -341,7 +341,8 @@ def Main(window):
  
   # Main event loop 
   key = window.getch()
-  while key != ord('q') and key != 27:
+  while key != ord('q'):
+# and key != 27:
     if key == curses.KEY_UP or key == ord('k'):
       cy, cx = curses.getsyx()
       if not cy < 4:

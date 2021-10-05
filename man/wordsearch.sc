@@ -17,14 +17,14 @@ After finishing a category, the player will be prompted to begin a new category,
 
 *wordsearch* supports the following command line arguments to customize gameplay:
 
-	*-t* 	Set a curses color theme for game play. These themes include: red, blue, green and black
+	*-t <color>*    Set a curses color theme for game play: red, blue, green and black
 
-	*-h* 	Show wordsearch command line arguments
+	*-h*            Show wordsearch command line arguments
 
-	*-v* 	Show wordsearch version
+	*-v*            Show wordsearch version
 
 # COMMANDS
-Help is available on screen during gameplay. A description of available commands is below:
+Help is available on screen during gameplay. A description of available commands are below:
 
 _Arrow keys:_ Move the cursor around the screen
 
@@ -37,13 +37,13 @@ _Q or Escape key:_ Exit to the shell prompt
 # CONVENTIONS
 Each word search puzzle generally features up to 9 words that make up that category. 
 
-Puzzles are available as wordlists and can be placed in any of the following directories:
+Puzzles are available as word lists and can be placed in any of the following directories:
 
 _puzzles/_
 _/usr/local/share/wordsearch/_
 _/usr/pkg/share/wordsearch/_
 
-Puzzles can edited in your text editor. When *wordsearch* is started, it will select a random wordlist for each category during gameplay. 
+Puzzles can be edited in your text editor. When *wordsearch* is started, it will select a random word list for each category during gameplay. 
 
 Word lists should be optimized for display on an 80-column text terminal. Ideally, the entire set of words in a category should be less then 80 characters.
 
