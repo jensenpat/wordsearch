@@ -27,8 +27,9 @@ Based on a printable word search page generator by Christian Hill (https://scipy
 wordsearch requires Python 3 to be installed before you can run it.
 
 1. You can download wordsearch as a a .zip file release, or clone this github repository for the latest updates.
-2. chmod +x wordsearch and run.
-3. Learn some great tips and tracks after installing by typing "man wordsearch"
+2. On Unix: chmod +x wordsearch and run it: ./wordsearch
+3. On Windows: python wordsearch
+4. Learn some great tips and tracks after installing by typing "man wordsearch"
 
 # Contributing:
 
