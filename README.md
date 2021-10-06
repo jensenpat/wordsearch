@@ -40,5 +40,6 @@ feel free to send a GitHub pull request.
 
 # Supported Platforms: 
 
-NetBSD pkgsrc
+NetBSD pkgsrc, 
+
 FreeBSD, MacOS, Linux
