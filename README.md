@@ -33,7 +33,7 @@ wordsearch requires Python 3 to be installed before you can run it.
 
 # Contributing:
 
-Would you like to create, add and contribute your own custom word searches? 
+Would you like to create, add and contribute your own custom word searches? We'd love to share them!
 
 E-mail your creations to wordsearch at passpackets.com or
 feel free to send a GitHub pull request.
