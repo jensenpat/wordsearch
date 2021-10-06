@@ -1,6 +1,6 @@
-# wordsearch
-
 ![wordsearch](https://user-images.githubusercontent.com/84298137/134269853-260fcbbe-1276-4f64-ab54-b12414c09150.jpg)
+
+# wordsearch
 
 Relax with a classic word search game that you can play in your terminal.
 
@@ -25,9 +25,10 @@ Based on a printable word search page generator by Christian Hill (https://scipy
 # Getting Started:
 
 wordsearch requires Python 3 to be installed before you can run it.
-You can download wordsearch as a a .zip file release, or clone github for the latest updates.
-Then just chmod +x wordsearch and run.
-More details on using wordsearch are available after installing by typing "man wordsearch"
+
+1. You can download wordsearch as a a .zip file release, or clone this github repository for the latest updates.
+2. chmod +x wordsearch and run.
+3. Learn some great tips and tracks after installing by typing "man wordsearch"
 
 # Contributing:
 
