@@ -25,7 +25,7 @@ import curses
 from copy import deepcopy
 from curses.textpad import rectangle
 
-wsver = "2.0"
+wsver = "2.1"
 
 # Maximum number of rows and columns.
 NMAX = 32
@@ -341,8 +341,11 @@ def Main(window):
  
   # Main event loop 
   key = window.getch()
-  while key != ord('q'):
-# and key != 27:
+  while True:
+    if key == ord('q'):
+      # highscore()
+      curses.endwin()
+      exit()
     if key == curses.KEY_UP or key == ord('k'):
       cy, cx = curses.getsyx()
       if not cy < 4:
