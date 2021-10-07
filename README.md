@@ -1,15 +1,46 @@
+![wordsearch](https://user-images.githubusercontent.com/84298137/134269853-260fcbbe-1276-4f64-ab54-b12414c09150.jpg)
+
 # wordsearch
 
 Relax with a classic word search game that you can play in your terminal.
 
 Based on a printable word search page generator by Christian Hill (https://scipython.com)
 
-wordsearch requires python3 to be installed before you can run it.
+# Features:
 
-Please copy the contents of the puzzle directory into /usr/local/share/wordsearch. 
+- Plays on your favorite operating systems
 
-Feel free to create, add and contribute your own custom word searches!
+- Full screen curses-based ANSI gameplay
 
-Supported Platforms: NetBSD, FreeBSD, MacOS, Linux
+- Use your arrow keys to navigate or you can use vi keys as well (hjkl)
 
-![wordsearch](https://user-images.githubusercontent.com/84298137/134269853-260fcbbe-1276-4f64-ab54-b12414c09150.jpg)
+- 65 fun word search puzzles packed with nostalgia
+
+- Color themes: pick what is easy on your eyes (red, green, blue and black)
+
+- It's simple to create your own puzzles in your favorite text editor
+
+- Word based scoring so you can relax without chasing a timer
+
+# Getting Started:
+
+wordsearch requires Python 3 to be installed before you can run it.
+
+1. You can download wordsearch as a a .zip file release, or clone this github repository for the latest updates.
+2. On Unix: chmod +x wordsearch and run it: ./wordsearch
+3. On Windows: python wordsearch
+
+After installing, you can learn some great tips and tricks by typing "man wordsearch".
+
+# Contributing:
+
+Would you like to create, add and contribute your own custom word searches? We'd love to share them!
+
+E-mail your creations to wordsearch at passpackets.com or
+feel free to send a GitHub pull request.
+
+# Supported Platforms: 
+
+NetBSD pkgsrc, 
+
+FreeBSD, MacOS, Linux
