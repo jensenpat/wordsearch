@@ -22,6 +22,10 @@ import os
 import sys
 import random
 import curses
+import getpass		
+import pickle		
+from operator import itemgetter
+from datetime import date
 from copy import deepcopy
 from curses.textpad import rectangle
 
@@ -260,6 +264,32 @@ def check_size(window):
     print("If you are using a windowed or virtual terminal, please resize your window to larger then 80x24.")
     exit()
 
+def scoreWrite():
+  HighscoreList = []
+
+  username = getpass.getuser()
+  today = date.today()
+  datestr = f"{today.month}/{today.day}/{today.year}"
+
+  print(f"user name is {username}")
+  print(f"score is {score}")
+  print(f"current date is {datestr}")
+
+  HighscoreList.append((username, score, datestr))
+  HighscoreList = sorted(HighscoreList, key=itemgetter(1), reverse=True)[:10]
+
+  with open('highscores.txt', 'wb') as Highscorefile:
+    pickle.dump(HighscoreList, Highscorefile)
+    exit()
+
+def scoreList():
+  HighscoreList = []
+
+  with open('highscores.txt', 'rb') as Highscorefile:
+    HighscoreList = pickle.load(Highscorefile)
+
+  print(HighscoreList)
+
 def Main(window):
   mask = None
   max_word_len = max(nrows, ncols)
@@ -343,9 +373,11 @@ def Main(window):
   key = window.getch()
   while True:
     if key == ord('q'):
-      # highscore()
+
       curses.endwin()
-      exit()
+      scoreWrite()
+      scoreList()
+ 
     if key == curses.KEY_UP or key == ord('k'):
       cy, cx = curses.getsyx()
       if not cy < 4:
@@ -497,8 +529,12 @@ if "-v" in opts:
   print()
   exit()
 
+if "-s" in opts:
+  scoreList()
+  exit()
+
 if "-h" in opts:
-  print(f"Usage: {sys.argv[0]} (-v | -h) (-t red|blue|black|green)")
+  print(f"Usage: {sys.argv[0]} (-v | -s | -h) (-t red|blue|black|green)")
   exit()
 
 if "-t" in opts:
