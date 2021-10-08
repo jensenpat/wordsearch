@@ -1,0 +1,9 @@
+colonists
+family
+feast
+mayflower
+plymouth
+settlers
+religion
+tradition
+treaty

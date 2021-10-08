@@ -265,6 +265,8 @@ def check_size(window):
     exit()
 
 def scoreWrite():
+# need to build proc to init scores and read them, before writing them
+
   HighscoreList = []
 
   username = getpass.getuser()
@@ -288,7 +290,8 @@ def scoreList():
   with open('highscores.txt', 'rb') as Highscorefile:
     HighscoreList = pickle.load(Highscorefile)
 
-  print(HighscoreList)
+  print(HighscoreList[0])
+  print(HighscoreList[1])
 
 def Main(window):
   mask = None
@@ -319,21 +322,25 @@ def Main(window):
   ScoreList = []
   CompletedList = []
 
-  # Initialize curses
-  curses.curs_set(2)
+  # Initialize curses. If we can't set cursor modes, continue
+  try:
+    curses.curs_set(2)
+  except: pass
 
-  # Theme picker
-  if (theme == "green"):
-    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-  if (theme == "black"):
-    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
-  if (theme == "red"):
-    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
-  if (theme == "blue"):
-    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
-  if not theme:
-    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
-  window.bkgd(' ', curses.color_pair(1))
+  # Theme picker. If we can't set color modes, continue
+  try:
+    if (theme == "green"):
+      curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    if (theme == "black"):
+      curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+    if (theme == "red"):
+      curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
+    if (theme == "blue"):
+      curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
+    if not theme:
+      curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
+    window.bkgd(' ', curses.color_pair(1))
+  except: pass
 
   # Render background UX
   window.hline(0, 0, " ", width, curses.A_REVERSE)

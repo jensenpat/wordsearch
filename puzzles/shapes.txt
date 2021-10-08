@@ -1,0 +1,9 @@
+octagon
+hexagon
+circle
+square
+triangle
+oval
+cone
+diamond
+rectangle
