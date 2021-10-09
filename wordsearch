@@ -267,19 +267,18 @@ def check_size(window):
 def scoreWrite():
   HighscoreList = []
 
+  # No need to write a score if we didn't play a game
+  if (score == 0):
+    exit()
+
   # Capture user and score details
   username = getpass.getuser()
   today = date.today()
   datestr = f"{today.month}/{today.day}/{today.year}"
 
-  # Debugs
-  print(f"user name is {username}")
-  print(f"score is {score}")
-  print(f"current date is {datestr}")
-
   # Open the high score if available
   try:
-    with open('highscores.txt', 'rb') as Highscorefile:
+    with open('/var/tmp/wsscore', 'rb') as Highscorefile:
       HighscoreList = pickle.load(Highscorefile)
   except: pass
 
@@ -290,17 +289,25 @@ def scoreWrite():
   HighscoreList = sorted(HighscoreList, key=itemgetter(1), reverse=True)[:10]
 
   # Write the last 10 scores to disk
-  with open('highscores.txt', 'wb') as Highscorefile:
+  with open('/var/tmp/wsscore', 'wb') as Highscorefile:
     pickle.dump(HighscoreList, Highscorefile)
     exit()
 
 def scoreList():
   HighscoreList = []
 
-  with open('highscores.txt', 'rb') as Highscorefile:
-    HighscoreList = pickle.load(Highscorefile)
+  try:
+    with open('/var/tmp/wsscore', 'rb') as Highscorefile:
+      HighscoreList = pickle.load(Highscorefile)
 
-  print(HighscoreList)
+    print("wordsearch")
+    print("High Scores")
+    print()
+    print("Username	Score		Date")
+
+    for a in HighscoreList:
+      print(a[0]+"		"+str(a[1])+"		"+a[2])
+  except: pass
 
 def Main(window):
   mask = None
