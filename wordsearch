@@ -265,21 +265,31 @@ def check_size(window):
     exit()
 
 def scoreWrite():
-# need to build proc to init scores and read them, before writing them
-
   HighscoreList = []
 
+  # Capture user and score details
   username = getpass.getuser()
   today = date.today()
   datestr = f"{today.month}/{today.day}/{today.year}"
 
+  # Debugs
   print(f"user name is {username}")
   print(f"score is {score}")
   print(f"current date is {datestr}")
 
+  # Open the high score if available
+  try:
+    with open('highscores.txt', 'rb') as Highscorefile:
+      HighscoreList = pickle.load(Highscorefile)
+  except: pass
+
+  # Add high score to the score list
   HighscoreList.append((username, score, datestr))
+  
+  # Sort the score list by score and identify 10 scores
   HighscoreList = sorted(HighscoreList, key=itemgetter(1), reverse=True)[:10]
 
+  # Write the last 10 scores to disk
   with open('highscores.txt', 'wb') as Highscorefile:
     pickle.dump(HighscoreList, Highscorefile)
     exit()
@@ -290,8 +300,7 @@ def scoreList():
   with open('highscores.txt', 'rb') as Highscorefile:
     HighscoreList = pickle.load(Highscorefile)
 
-  print(HighscoreList[0])
-  print(HighscoreList[1])
+  print(HighscoreList)
 
 def Main(window):
   mask = None
