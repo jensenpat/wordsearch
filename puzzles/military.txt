@@ -1,0 +1,9 @@
+airforce
+marines
+camouflage
+cannon
+navy
+coastguard
+army
+canteen
+grenade

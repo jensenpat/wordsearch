@@ -1,0 +1,9 @@
+tractor
+chicken
+mulch
+barn
+flock
+haybail
+acreage
+goats
+crops
