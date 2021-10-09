@@ -1,9 +1,0 @@
-coaster
-popcorn
-corndog
-mascots
-character
-logride
-theater
-train
-ticket
