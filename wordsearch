@@ -354,6 +354,8 @@ def Main(window):
       curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
     if (theme == "blue"):
       curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
+    if (theme == "purple"):
+      curses.init_pair(1, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
     if not theme:
       curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
     window.bkgd(' ', curses.color_pair(1))
@@ -558,7 +560,7 @@ if "-s" in opts:
   exit()
 
 if "-h" in opts:
-  print(f"Usage: {sys.argv[0]} (-v | -s | -h) (-t red|blue|black|green)")
+  print(f"Usage: {sys.argv[0]} (-v | -s | -h) (-t red|blue|black|green|purple)")
   exit()
 
 if "-t" in opts:
