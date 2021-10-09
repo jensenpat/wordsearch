@@ -269,7 +269,7 @@ def scoreWrite():
 
   # No need to write a score if we didn't play a game
   if (score == 0):
-    exit()
+    return()
 
   # Capture user and score details
   username = getpass.getuser()
@@ -308,6 +308,7 @@ def scoreList():
     for a in HighscoreList:
       print(a[0]+"		"+str(a[1])+"		"+a[2])
   except: pass
+  exit()
 
 def Main(window):
   mask = None
