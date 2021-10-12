@@ -1,4 +1,4 @@
-![wordsearch](https://user-images.githubusercontent.com/84298137/134269853-260fcbbe-1276-4f64-ab54-b12414c09150.jpg)
+<img width="780" alt="Screen Shot 2021-10-11 at 8 20 43 PM" src="https://user-images.githubusercontent.com/84298137/136885856-792937bd-da47-4b01-be29-f2cfca099ffd.png">
 
 # wordsearch
 
@@ -41,6 +41,4 @@ feel free to send a GitHub pull request.
 
 # Supported Platforms: 
 
-NetBSD pkgsrc, 
-
-FreeBSD, MacOS, Linux
+NetBSD pkgsrc, FreeBSD ports, MacOS 11, Linux
