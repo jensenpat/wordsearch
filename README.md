@@ -28,7 +28,6 @@ wordsearch requires Python 3 to be installed before you can run it.
 
 1. You can download wordsearch as a a .zip file release, or clone this github repository for the latest updates.
 2. On Unix: chmod +x wordsearch and run it: ./wordsearch
-3. On Windows: python wordsearch
 
 After installing, you can learn some great tips and tricks by typing "man wordsearch".
 
