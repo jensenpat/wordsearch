@@ -10,7 +10,7 @@ Based on a printable word search page generator by Christian Hill (https://scipy
 
 - Word based scoring so you can relax without chasing a timer
 
-- 75 fun word search puzzles packed with nostalgia
+- 82 fun word search puzzles packed with nostalgia
 
 - Color themes: pick what is easy on your eyes (red, green, blue and black)
 
