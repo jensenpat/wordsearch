@@ -12,7 +12,7 @@ Based on a printable word search page generator by Christian Hill (https://scipy
 
 - 82 fun word search puzzles packed with nostalgia
 
-- Color themes: pick what is easy on your eyes (red, green, blue and black)
+- Color themes: pick what is easy on your eyes (red, green, purple, blue and black)
 
 - Plays on your favorite operating systems
 
