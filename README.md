@@ -40,4 +40,4 @@ feel free to send a GitHub pull request.
 
 # Supported Platforms: 
 
-NetBSD pkgsrc, FreeBSD ports, MacOS 11, Linux
+NetBSD pkgsrc, FreeBSD ports, OpenBSD ports, MacOS 11, Linux
