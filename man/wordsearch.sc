@@ -17,7 +17,7 @@ After finishing a category, the player will be prompted to begin a new category,
 
 *wordsearch* supports the following command line arguments to customize gameplay:
 
-	*-t <color>*    Set a curses color theme for game play: red, blue, green and black
+	*-t <color>*    Set a curses color theme for game play: red, blue, green, purple and black
 
 	*-h*            Show wordsearch command line arguments
 
