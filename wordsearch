@@ -399,10 +399,10 @@ def Main(window):
   key = window.getch()
   while True:
     if key == ord('q'):
-
       curses.endwin()
-      scoreWrite()
-      scoreList()
+      # scoreWrite()
+      # scoreList()
+      exit()
  
     if key == curses.KEY_UP or key == ord('k'):
       cy, cx = curses.getsyx()
@@ -555,9 +555,9 @@ if "-v" in opts:
   print()
   exit()
 
-if "-s" in opts:
-  scoreList()
-  exit()
+#if "-s" in opts:
+#  scoreList()
+#  exit()
 
 if "-h" in opts:
   print(f"Usage: {sys.argv[0]} (-v | -s | -h) (-t red|blue|black|green|purple)")
