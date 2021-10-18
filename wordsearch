@@ -224,7 +224,8 @@ def adjac(ele, sub = []):
   if not ele:
      yield sub
   else:
-     yield from [idx for j in range(ele[0] - 1, ele[0] + 3)
+     # ele[0] - 1, ele[0] + 3
+     yield from [idx for j in range(ele[0] - 2, ele[0] + 3)
                 for idx in adjac(ele[1:], sub + [j])]
 
 def puzzlepicker():
@@ -498,7 +499,7 @@ def Main(window):
 
         # Now let's check for a word match
         for word in wordlist:
-          if (word == scoreword):
+          if (word == scoreword) or (word == scoreword[::-1]):
             # Increase score based on number of chars
             score = score + len(word)	
 
