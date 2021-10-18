@@ -363,7 +363,7 @@ def Main(window):
 
   # Render background UX
   window.hline(0, 0, " ", width, curses.A_REVERSE)
-  category = wordlist_filename.replace(".txt", "")
+  category = (os.path.basename(wordlist_filename)).replace(".txt", "")
   window.addstr(0, 0, category.center(width, ' '), curses.A_REVERSE)
   window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
 
