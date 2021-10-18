@@ -29,7 +29,7 @@ from datetime import date
 from copy import deepcopy
 from curses.textpad import rectangle
 
-wsver = "2.1"
+wsver = "2.2"
 
 # Maximum number of rows and columns.
 NMAX = 32
@@ -400,8 +400,8 @@ def Main(window):
   while True:
     if key == ord('q'):
       curses.endwin()
-      # scoreWrite()
-      # scoreList()
+      scoreWrite()
+      scoreList()
       exit()
  
     if key == curses.KEY_UP or key == ord('k'):
@@ -454,6 +454,7 @@ def Main(window):
       ScoreList.clear()
       window.addstr(10, 60, "                 ")
       scoreword = ''
+
       window.move(cy, cx)  
 
     # Space to score
@@ -555,9 +556,9 @@ if "-v" in opts:
   print()
   exit()
 
-#if "-s" in opts:
-#  scoreList()
-#  exit()
+if "-s" in opts:
+  scoreList()
+  exit()
 
 if "-h" in opts:
   print(f"Usage: {sys.argv[0]} (-v | -s | -h) (-t red|blue|black|green|purple)")
