@@ -438,6 +438,22 @@ def Main(window):
           curses.beep()
           window.refresh()
     elif key == curses.KEY_RESIZE:
+      maxy, maxx = window.getmaxyx() 
+      window.resize(maxy, maxx)
+      window.clear()
+      window.bkgd(' ', curses.color_pair(1))
+      window.hline(0, 0, " ", maxx, curses.A_REVERSE)
+      category = (os.path.basename(wordlist_filename)).replace(".txt", "")
+      window.addstr(0, 0, category.center(width, ' '), curses.A_REVERSE)
+      window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
+      scoretext = "Score: " + str(score)
+      sx = maxx - 9
+      sx = sx - len(str(score))
+      window.addstr(0, sx, scoretext, curses.A_REVERSE)
+      wordlistdisp = listToString(wordlist)
+      window.addstr(20, 0, wordlistdisp.center(maxx, ' '))
+      window.addstr(maxy-1, 0, "Arrow keys to navigate. Space: Select, Return: Clear, Q: Quit")
+      window.move(10, 37)
       window.refresh()
 
     # Return to wipe

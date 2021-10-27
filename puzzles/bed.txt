@@ -1,0 +1,9 @@
+duvet
+pillow
+sham
+mattress
+bedskirt
+blanket
+sheet
+cushion
+boxspring

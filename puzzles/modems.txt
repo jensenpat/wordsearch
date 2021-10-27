@@ -1,0 +1,9 @@
+modulate
+signal
+baudrate
+compress
+error
+atcommand
+hayes
+xmodem
+protocol

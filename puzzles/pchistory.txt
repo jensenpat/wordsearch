@@ -1,0 +1,9 @@
+tandy
+compaq
+gateway
+dell
+digital
+hp
+apple
+ibmpc
+sunmicro

@@ -1,0 +1,9 @@
+cbbs
+ascii
+ansi
+fidonet
+msgbase
+warez
+doorgame
+forums
+sysop
