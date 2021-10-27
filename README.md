@@ -10,13 +10,15 @@ Based on a printable word search page generator by Christian Hill (https://scipy
 
 - Word based scoring so you can relax without chasing a timer
 
-- 82 fun word search puzzles packed with nostalgia
+- 90 fun word search puzzles packed with nostalgia
 
 - Color themes: pick what is easy on your eyes (red, green, purple, blue and black)
 
 - Plays on your favorite operating systems
 
 - Full screen curses-based ANSI gameplay
+
+- Support for classic 80-column serial terminals
 
 - Use your arrow keys to navigate or you can use vi keys as well (hjkl)
 
@@ -33,11 +35,17 @@ After installing, you can learn some great tips and tricks by typing "man wordse
 
 # Contributing:
 
-Would you like to create, add and contribute your own custom word searches? We'd love to share them!
+Are you playing wordsearch on a dedicated serial terminal? I'd really love to see a picture.
+
+Would you like to create, add and contribute your own custom word searches? I'd love to share them!
 
 E-mail your creations to wordsearch at passpackets.com or
 feel free to send a GitHub pull request.
 
 # Supported Platforms: 
 
-NetBSD pkgsrc, FreeBSD ports, OpenBSD ports, MacOS 11, Linux
+NetBSD pkgsrc: pkgin add wordsearch
+OpenBSD ports: pkg_add wordsearch
+FreeBSD ports: pkg add wordsearch
+MacOS 11
+Linux
