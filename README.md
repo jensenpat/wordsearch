@@ -45,7 +45,11 @@ feel free to send a GitHub pull request.
 # Supported Platforms: 
 
 NetBSD pkgsrc: pkgin add wordsearch
+
 OpenBSD ports: pkg_add wordsearch
+
 FreeBSD ports: pkg add wordsearch
+
 MacOS 11
+
 Linux
