@@ -1,0 +1,9 @@
+lockdown
+curve
+flatten
+essential
+quarantine
+isolation
+attack
+fatality
+vaccine

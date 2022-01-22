@@ -2,7 +2,7 @@
 
 # Wordsearch
 #
-# Copyright (c) 2021
+# Copyright (c) 2022
 # Pat Jensen (patj@passpackets.com)
 # All rights reserved.
 #
@@ -558,7 +558,7 @@ args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
 
 if "-v" in opts:
   print(f"Wordsearch {wsver}")
-  print("Copyright (c) 2021 Pat Jensen")
+  print("Copyright (c) 2022 Pat Jensen")
   print("All rights reserved.")
   print()
   print("Redistribution and use in source and binary forms, with or without")
