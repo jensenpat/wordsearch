@@ -1,0 +1,9 @@
+ethernet
+hdmi
+usb
+power
+coaxial
+joystick
+dvi
+vga
+optical
