@@ -1,0 +1,9 @@
+grind
+ollie
+deck
+crew
+halfpipe
+kickflip
+rail
+trucks
+bearings
