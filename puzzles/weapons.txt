@@ -1,0 +1,9 @@
+sword
+dagger
+blaster
+firearm
+grenade
+longbow
+rocket
+tank
+spear

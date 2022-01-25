@@ -2,7 +2,6 @@ tokenring
 arcnet
 ethernet
 localtalk
-ncp
 decnet
 bitnet
 arpanet

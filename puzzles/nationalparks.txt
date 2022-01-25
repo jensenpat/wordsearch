@@ -4,6 +4,5 @@ mtrainier
 sequoia
 redwood
 arches
-everglades
 yellowstone
 glacierbay

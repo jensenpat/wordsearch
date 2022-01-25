@@ -1,0 +1,9 @@
+chrome
+brass
+lead
+steel
+silver
+zinc
+platinum
+copper
+gold

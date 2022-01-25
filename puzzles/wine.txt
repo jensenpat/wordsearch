@@ -6,4 +6,3 @@ chardonnay
 moscato
 dessert
 sparkling
-pinotgrigio
