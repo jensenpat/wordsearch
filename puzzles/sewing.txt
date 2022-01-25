@@ -1,0 +1,9 @@
+bobbin
+stitch
+feeddog
+needle
+thread
+fabric
+iron
+ruler
+scissors

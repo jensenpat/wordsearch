@@ -1,0 +1,9 @@
+happy
+grateful
+joyful
+sorrow
+anger
+fearful
+fondness
+jealous
+peaceful

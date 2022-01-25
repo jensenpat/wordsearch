@@ -1,0 +1,9 @@
+platypus
+panda
+kangaroo
+antelope
+badger
+cheetah
+elephant
+gazelle
+jaguar

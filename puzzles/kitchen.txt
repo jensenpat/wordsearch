@@ -1,0 +1,9 @@
+spatula
+dish
+oven
+microwave
+toaster
+coffeepot
+spices
+kettle
+mixer
