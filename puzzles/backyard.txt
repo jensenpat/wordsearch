@@ -1,0 +1,9 @@
+garden
+bucket
+flowers
+porch
+hedges
+swing
+vine
+terrace
+firepit
