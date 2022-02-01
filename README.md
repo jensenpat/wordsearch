@@ -1,4 +1,4 @@
-<img src="https://user-images.githubusercontent.com/84298137/151912997-9f2d2583-d7c2-4870-bd08-f19521d3a9b4.png" width="300" height="200">
+<img src="https://user-images.githubusercontent.com/84298137/151912997-9f2d2583-d7c2-4870-bd08-f19521d3a9b4.png" width="350" height="350">
 
 <img src="https://img.shields.io/static/v1?label=platforms&message=NetBSD | OpenBSD | FreeBSD | Linux&color=blue">
 
