@@ -1,6 +1,6 @@
 <img src="https://user-images.githubusercontent.com/84298137/151912997-9f2d2583-d7c2-4870-bd08-f19521d3a9b4.png" width="320" height="240">
 
-<img src="https://badgen.net/github/last-commit/jensenpat/wordsearch?color=blue"> <img src="https://img.shields.io/github/downloads/jensenpat/wordsearch/total.svg?color=blue"> <img src="https://img.shields.io/github/stars/jensenpat/wordsearch.svg?color=blue"> <img src="https://img.shields.io/github/issues-closed/jensenpat/wordsearch.svg?color=blue">
+<img src="https://badgen.net/github/release/jensenpat/wordsearch?color=blue"> <img src="https://badgen.net/github/last-commit/jensenpat/wordsearch?color=blue"> <img src="https://img.shields.io/github/downloads/jensenpat/wordsearch/total.svg?color=blue"> <img src="https://img.shields.io/github/stars/jensenpat/wordsearch.svg?color=blue">
 
 # wordsearch
 
