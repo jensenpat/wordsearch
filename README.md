@@ -1,4 +1,6 @@
-<img width="780" alt="Screen Shot 2021-10-11 at 8 20 43 PM" src="https://user-images.githubusercontent.com/84298137/136885856-792937bd-da47-4b01-be29-f2cfca099ffd.png">
+<img src="https://user-images.githubusercontent.com/84298137/151912997-9f2d2583-d7c2-4870-bd08-f19521d3a9b4.png" width="320" height="240">
+
+<img src="https://badgen.net/github/last-commit/jensenpat/wordsearch?color=blue"> <img src="https://img.shields.io/github/downloads/jensenpat/wordsearch/total.svg?color=blue"> <img src="https://img.shields.io/github/stars/jensenpat/wordsearch.svg?color=blue"> <img src="https://img.shields.io/github/issues-closed/jensenpat/wordsearch.svg?color=blue">
 
 # wordsearch
 
@@ -23,6 +25,10 @@ Based on a printable word search page generator by Christian Hill (https://scipy
 - Use your arrow keys to navigate or you can use vi keys as well (hjkl)
 
 - It's simple to create your own puzzles in your favorite text editor
+
+# Screenshot:
+
+<img width="780" alt="Screen Shot 2021-10-11 at 8 20 43 PM" src="https://user-images.githubusercontent.com/84298137/136885856-792937bd-da47-4b01-be29-f2cfca099ffd.png">
 
 # Getting Started:
 
