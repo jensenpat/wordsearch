@@ -2,6 +2,8 @@
 
 <img src="https://badgen.net/github/release/jensenpat/wordsearch?color=blue"> <img src="https://badgen.net/github/last-commit/jensenpat/wordsearch?color=blue"> <img src="https://img.shields.io/github/downloads/jensenpat/wordsearch/total.svg?color=blue"> <img src="https://img.shields.io/github/stars/jensenpat/wordsearch.svg?color=blue">
 
+<img src="https://img.shields.io/static/v1?label=platforms&message=NetBSD | OpenBSD | FreeBSD | Linux&color=blue">
+
 # wordsearch
 
 Relax with a classic word search game that you can play in your terminal.
