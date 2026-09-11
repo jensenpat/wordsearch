@@ -31,7 +31,7 @@ from datetime import date
 from copy import deepcopy
 from curses.textpad import rectangle
 
-wsver = "2.2"
+wsver = "3.0"
 
 # Maximum number of rows and columns.
 NMAX = 32
