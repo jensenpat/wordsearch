@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
 
 # Wordsearch
 #
@@ -8,7 +8,7 @@
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice, this
 #    list of conditions and the following disclaimer.
 #
@@ -22,8 +22,9 @@ import os
 import sys
 import random
 import curses
-import getpass		
-import pickle		
+import getpass
+import pickle
+import textwrap
 from operator import itemgetter
 from datetime import date
 from copy import deepcopy
@@ -39,6 +40,21 @@ ncols = 15
 
 score = 0
 theme = ''
+
+# Neighbors for a straight-line selection (8 directions).
+LINE_DIRS = (
+    (-1, -1), (-1, 0), (-1, 1),
+    (0, -1),           (0, 1),
+    (1, -1),  (1, 0),  (1, 1),
+)
+
+HELP_LONG = "Arrows/hjkl/mouse: move  Space/click: select  Return: clear  Q/Esc: quit"
+HELP_SHORT = "hjkl/mouse  Space/click  Return  Q/Esc"
+
+# SGR + any-event tracking: iTerm and tmux pass hover (1003) and click (1006).
+MOUSE_TRACK_ON = b'\033[?1000h\033[?1002h\033[?1003h\033[?1006h'
+MOUSE_TRACK_OFF = b'\033[?1003l\033[?1002l\033[?1000l\033[?1006l'
+
 
 def circle_mask(grid):
     """A circular mask to shape the grid."""
@@ -85,6 +101,7 @@ def _make_wordsearch(nrows, ncols, wordlist, allow_backwards_words=True,
     """Attempt to make a word search with the given parameters."""
 
     grid = make_grid(mask)
+    placed_words = []
 
     def fill_grid_randomly(grid):
         """Fill up the empty, unmasked positions with random letters."""
@@ -114,16 +131,18 @@ def _make_wordsearch(nrows, ncols, wordlist, allow_backwards_words=True,
     def place_word(word):
         """Place word randomly in the grid and return True, if possible."""
 
+        display = word
         # Left, down, and the diagonals.
         dxdy_choices = [(0,1), (1,0), (1,1), (1,-1)]
         random.shuffle(dxdy_choices)
         for (dx, dy) in dxdy_choices:
+            placed = word
             if allow_backwards_words and random.choice([True, False]):
                     # If backwards words are allowed, simply reverse word.
-                    word = word[::-1]
+                    placed = word[::-1]
             # Work out the minimum and maximum column and row indexes, given
             # the word length.
-            n = len(word)
+            n = len(placed)
             colmin = 0
             colmax = ncols - n if dx else ncols - 1
             rowmin = 0 if dy >= 0 else n - 1
@@ -135,26 +154,27 @@ def _make_wordsearch(nrows, ncols, wordlist, allow_backwards_words=True,
             candidates = []
             for irow in range(rowmin, rowmax+1):
                 for icol in range(colmin, colmax+1):
-                    if test_candidate(irow, icol, dx, dy, word):
+                    if test_candidate(irow, icol, dx, dy, placed):
                         candidates.append((irow, icol))
             # If we don't have any candidates, try the next orientation.
             if not candidates:
                 continue
             # Pick a random candidate location and place the word in this
             # orientation.
-            loc = irow, icol = random.choice(candidates)
+            irow, icol = random.choice(candidates)
+            cells = []
             for j in range(n):
-                grid[irow][icol] = word[j]
+                grid[irow][icol] = placed[j]
+                cells.append((irow, icol))
                 irow += dy
                 icol += dx
+            placed_words.append((display, tuple(cells)))
             # We're done: no need to try any more orientations.
             break
         else:
             # If we're here, it's because we tried all orientations but
             # couldn't find anywhere to place the word. Oh dear.
             return False
-        # will use this later for scoring
-        # print(word, loc, (dx, dy))
         return True
 
     # Iterate over the word list and try to place each word (without spaces).
@@ -162,7 +182,7 @@ def _make_wordsearch(nrows, ncols, wordlist, allow_backwards_words=True,
         word = word.replace(' ', '')
         if not place_word(word):
             # We failed to place word, so bail.
-            return None, None
+            return None, None, None
 
     # grid is a list of lists, so we need to deepcopy here for an independent
     # copy to keep as the solution (without random letters in unfilled spots).
@@ -171,7 +191,7 @@ def _make_wordsearch(nrows, ncols, wordlist, allow_backwards_words=True,
     remove_mask(grid)
     remove_mask(solution)
 
-    return grid, solution
+    return grid, solution, placed_words
 
 
 def make_wordsearch(*args, **kwargs):
@@ -180,13 +200,12 @@ def make_wordsearch(*args, **kwargs):
     # We try NATTEMPTS times (with random orientations) before giving up.
     NATTEMPTS = 10
     for i in range(NATTEMPTS):
-        grid, solution = _make_wordsearch(*args, **kwargs)
+        grid, solution, placed = _make_wordsearch(*args, **kwargs)
         if grid:
-            # print('Fitted the words in {} attempt(s)'.format(i+1))
-            return grid, solution
+            return grid, solution, placed
     print('I failed to place all the words after {} attempts.'
           .format(NATTEMPTS))
-    return None, None
+    return None, None, None
 
 def show_grid_text(grid):
     """Output a text version of the filled grid wordsearch."""
@@ -216,54 +235,448 @@ def get_wordlist(wordlist_filename):
             wordlist.append(line)
     return wordlist
 
-def listToString(s): 
-    str1 = " " 
+def listToString(s):
+    str1 = " "
     return (str1.join(s))
 
-def adjac(ele, sub = []):
-  if not ele:
-     yield sub
-  else:
-     # ele[0] - 1, ele[0] + 3
-     yield from [idx for j in range(ele[0] - 2, ele[0] + 3)
-                for idx in adjac(ele[1:], sub + [j])]
+def puzzle_dirs():
+    """Directories that may hold puzzle word lists."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return [
+        os.path.join(script_dir, 'puzzles'),
+        'puzzles',
+        '/usr/local/share/wordsearch',
+        '/usr/pkg/share/wordsearch',
+    ]
 
 def puzzlepicker():
-  # Prefer local puzzles/ directory first, then try BSD paths
-  # /usr/local/share and /usr/pkg/share
-  picked = 0
-  wordlist_filename = ''
+    # Prefer puzzles next to this script, then cwd, then BSD share paths.
+    for directory in puzzle_dirs():
+        if not os.path.isdir(directory):
+            continue
+        files = [f for f in os.listdir(directory)
+                 if f.endswith('.txt') and not f.startswith('.')]
+        if not files:
+            continue
+        return os.path.join(directory, random.choice(files))
 
-  if (os.path.isdir("puzzles")):
-    wordlist_filename = 'puzzles/' + ''.join(random.choice(os.listdir("puzzles/")))
-    picked = 1
-
-  if (os.path.isdir("/usr/local/share/wordsearch")) and not picked == 1:
-    wordlist_filename = '/usr/local/share/wordsearch/' + ''.join(random.choice(os.listdir("/usr/local/share/wordsearch/")))
-    picked = 1
-  
-  if (os.path.isdir("/usr/pkg/share/wordsearch")) and not picked == 1:
-    wordlist_filename = '/usr/pkg/share/wordsearch/' + ''.join(random.choice(os.listdir("/usr/pkg/share/wordsearch/")))
-    picked = 1
-
-  if not wordlist_filename:
-    curses.endwin() 
-    print("Please make sure you have placed puzzle files in one of the following directories:")
-    print("puzzles/")
-    print("/usr/local/share/wordsearch/")
-    print("/usr/pkg/share/wordsearch/")
-    exit()
-
-  return wordlist_filename
-
-def check_size(window):
-  height, width = window.getmaxyx()
-  if not height > 23 or not width > 79:
     curses.endwin()
-    print("wordsearch requires an 80-column terminal to play.")
-    print("You are " + str(width) + "x" + str(height))
-    print("If you are using a windowed or virtual terminal, please resize your window to larger then 80x24.")
+    print("Please make sure you have placed puzzle files in one of the following directories:")
+    for directory in puzzle_dirs():
+        print(directory + "/")
     exit()
+
+def min_term_size():
+    """Smallest terminal that can hold the grid, chrome, and a word-list line."""
+    inner_w = ncols * 2 - 1
+    min_w = inner_w + 4
+    min_h = nrows + 7
+    return min_h, min_w
+
+def addstr_clip(window, y, x, text, attr=0):
+    """Write text without raising on the bottom-right cell or a short line."""
+    try:
+        maxy, maxx = window.getmaxyx()
+    except curses.error:
+        return
+    if y < 0 or y >= maxy or x < 0 or x >= maxx:
+        return
+    limit = maxx - x
+    if y == maxy - 1:
+        limit = max(0, limit - 1)
+    if limit <= 0:
+        return
+    try:
+        window.addnstr(y, x, text, limit, attr)
+    except curses.error:
+        pass
+
+def hline_clip(window, y, x, ch, length, attr=0):
+    try:
+        maxy, maxx = window.getmaxyx()
+    except curses.error:
+        return
+    if y < 0 or y >= maxy or x < 0 or x >= maxx or length <= 0:
+        return
+    n = min(length, maxx - x)
+    if y == maxy - 1:
+        n = max(0, n - 1)
+    if n <= 0:
+        return
+    try:
+        window.hline(y, x, ch, n, attr)
+    except curses.error:
+        pass
+
+def cell_to_yx(layout, row, col):
+    return layout['grid_top'] + row, layout['grid_left'] + col * 2
+
+def yx_to_cell(layout, y, x):
+    """Map a window coordinate to a grid cell, or None if off the letters."""
+    row = y - layout['grid_top']
+    dx = x - layout['grid_left']
+    if row < 0 or row >= nrows:
+        return None
+    if dx < 0 or dx % 2 != 0:
+        return None
+    col = dx // 2
+    if col < 0 or col >= ncols:
+        return None
+    return row, col
+
+def compute_layout(maxy, maxx):
+    """Place the letter box in the usable area under the header."""
+    inner_w = ncols * 2 - 1
+    box_h = nrows + 2
+    box_w = inner_w + 2
+
+    box_ulx = max(0, (maxx - box_w) // 2)
+    # Header + gap above; gap + word-list + footer below.
+    chrome_top = 2
+    chrome_bot = 3
+    avail = maxy - chrome_top - chrome_bot
+    if avail > box_h:
+        box_uly = chrome_top + (avail - box_h) // 2
+    else:
+        box_uly = chrome_top
+
+    box_lry = box_uly + nrows + 1
+    box_lrx = box_ulx + inner_w + 1
+    wordlist_y = min(box_lry + 1, maxy - 2)
+    if wordlist_y <= box_lry:
+        wordlist_y = box_lry + 1
+
+    preview_x = box_lrx + 2
+    preview_y = box_uly + 1
+    show_preview = preview_x + 4 < maxx
+
+    return {
+        'maxy': maxy,
+        'maxx': maxx,
+        'box_uly': box_uly,
+        'box_ulx': box_ulx,
+        'box_lry': box_lry,
+        'box_lrx': box_lrx,
+        'grid_top': box_uly + 1,
+        'grid_left': box_ulx + 1,
+        'wordlist_y': wordlist_y,
+        'footer_y': maxy - 1,
+        'preview_x': preview_x,
+        'preview_y': preview_y,
+        'show_preview': show_preview,
+    }
+
+def wait_for_size(window):
+    """Block until the pane is large enough, or the player quits."""
+    min_h, min_w = min_term_size()
+    while True:
+        try:
+            maxy, maxx = window.getmaxyx()
+        except curses.error:
+            maxy, maxx = 0, 0
+        if maxy >= min_h and maxx >= min_w:
+            return True
+        try:
+            window.erase()
+        except curses.error:
+            pass
+        msg = ("wordsearch needs at least {0}x{1} (now {2}x{3}). "
+               "Resize this pane, or Q/Esc to quit.".format(
+                   min_w, min_h, maxx, maxy))
+        addstr_clip(window, 0, 0, msg)
+        try:
+            window.refresh()
+        except curses.error:
+            pass
+        key = read_key(window)
+        if key in (ord('q'), ord('Q'), 27):
+            return False
+
+def apply_theme(window):
+    """Color themes. With no -t, keep the terminal's own fg/bg."""
+    try:
+        curses.start_color()
+    except curses.error:
+        return
+    try:
+        curses.use_default_colors()
+        default_fg, default_bg = -1, -1
+    except curses.error:
+        default_fg, default_bg = curses.COLOR_WHITE, curses.COLOR_BLACK
+    try:
+        if theme == "green":
+            curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        elif theme == "black":
+            curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+        elif theme == "red":
+            curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
+        elif theme == "blue":
+            curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
+        elif theme == "purple":
+            curses.init_pair(1, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+        else:
+            # No -t: inherit the emulator palette (white-on-black, solarized, …).
+            curses.init_pair(1, default_fg, default_bg)
+        window.bkgd(' ', curses.color_pair(1))
+    except curses.error:
+        pass
+
+def _write_csi(seq):
+    try:
+        os.write(sys.stdout.fileno(), seq)
+    except OSError:
+        pass
+
+def enable_mouse(window):
+    """Clicks and hover motion for iTerm, tmux, and other SGR-mouse terminals."""
+    try:
+        mask = curses.ALL_MOUSE_EVENTS
+        if hasattr(curses, 'REPORT_MOUSE_POSITION'):
+            mask |= curses.REPORT_MOUSE_POSITION
+        curses.mousemask(mask)
+    except (AttributeError, curses.error):
+        return
+    try:
+        curses.mouseinterval(0)
+    except (AttributeError, curses.error):
+        pass
+    _write_csi(MOUSE_TRACK_ON)
+
+def disable_mouse():
+    _write_csi(MOUSE_TRACK_OFF)
+
+def _getch_timeout(window, ms):
+    """Read one byte with a short timeout, then restore blocking gets."""
+    try:
+        window.timeout(ms)
+        ch = window.getch()
+    finally:
+        try:
+            window.timeout(-1)
+        except curses.error:
+            pass
+    return ch
+
+def _read_sgr_mouse(window, first=None):
+    """Parse SGR mouse: ESC [ < btn ; x ; y M/m  (coords are 1-based)."""
+    chars = []
+    if first is not None:
+        chars.append(first)
+    while True:
+        ch = _getch_timeout(window, 30)
+        if ch in (curses.ERR, None):
+            return None
+        if ch in (ord('M'), ord('m')):
+            release = ch == ord('m')
+            break
+        if ch < 0 or ch > 255:
+            return None
+        chars.append(chr(ch))
+    try:
+        btn_s, x_s, y_s = ''.join(chars).split(';')
+        btn, x, y = int(btn_s), int(x_s) - 1, int(y_s) - 1
+    except (TypeError, ValueError):
+        return None
+    motion = bool(btn & 32)
+    button = (btn & 3) + 1
+    if (btn & 3) == 3:
+        button = 0
+    if release:
+        kind = 'release'
+    elif motion or button == 0:
+        kind = 'move'
+    else:
+        kind = 'press'
+    return ('mouse', x, y, kind, button)
+
+def _read_x10_mouse(window):
+    """Parse X10 mouse: ESC [ M Cb Cx Cy  (each byte is value + 32)."""
+    cb = _getch_timeout(window, 30)
+    cx = _getch_timeout(window, 30)
+    cy = _getch_timeout(window, 30)
+    if curses.ERR in (cb, cx, cy) or min(cb, cx, cy) < 0:
+        return None
+    btn = cb - 32
+    x, y = cx - 33, cy - 33
+    motion = bool(btn & 32)
+    button = (btn & 3) + 1
+    if (btn & 3) == 3:
+        button = 0
+        kind = 'move' if motion else 'release'
+    elif motion:
+        kind = 'move'
+    else:
+        kind = 'press'
+    return ('mouse', x, y, kind, button)
+
+def read_key(window):
+    """getch that turns mouse CSI into ('mouse', x, y, kind, button).
+
+    iTerm/tmux SGR tracking starts with ESC, which used to look like Quit.
+    A lone Escape (no follow-up within 30ms) is still 27.
+    """
+    key = window.getch()
+    if key == getattr(curses, 'KEY_MOUSE', -2):
+        try:
+            _id, mx, my, _z, bstate = curses.getmouse()
+        except curses.error:
+            return curses.ERR
+        pressed = bstate & getattr(curses, 'BUTTON1_PRESSED', 0)
+        clicked = bstate & getattr(curses, 'BUTTON1_CLICKED', 0)
+        released = bstate & getattr(curses, 'BUTTON1_RELEASED', 0)
+        if pressed or clicked:
+            kind, button = 'press', 1
+        elif released:
+            kind, button = 'release', 1
+        else:
+            kind, button = 'move', 0
+        return ('mouse', mx, my, kind, button)
+
+    if key != 27:
+        return key
+
+    nxt = _getch_timeout(window, 30)
+    if nxt in (curses.ERR, None):
+        return 27
+    if nxt != ord('['):
+        # Alt-plus-key or a stray byte — not a quit, not a mouse event.
+        return curses.ERR
+
+    kind = _getch_timeout(window, 30)
+    if kind == ord('<'):
+        event = _read_sgr_mouse(window)
+        return event if event else curses.ERR
+    if kind == ord('M'):
+        event = _read_x10_mouse(window)
+        return event if event else curses.ERR
+    # Other CSI (paste, focus, …): drain until a final byte 0x40-0x7e.
+    if kind not in (curses.ERR, None) and not (0x40 <= kind <= 0x7e):
+        while True:
+            ch = _getch_timeout(window, 30)
+            if ch in (curses.ERR, None) or (0x40 <= ch <= 0x7e):
+                break
+    return curses.ERR
+
+def init_curses(window):
+    try:
+        curses.curs_set(2)
+    except curses.error:
+        try:
+            curses.curs_set(1)
+        except curses.error:
+            pass
+    try:
+        window.keypad(True)
+    except curses.error:
+        pass
+    try:
+        curses.meta(1)
+    except (AttributeError, curses.error):
+        pass
+    try:
+        curses.set_escdelay(25)
+    except (AttributeError, curses.error):
+        pass
+    apply_theme(window)
+    enable_mouse(window)
+
+def path_letters(grid, path):
+    return ''.join(grid[r][c] for r, c in path)
+
+def path_is_step(path, row, col):
+    """True if (row, col) continues the current straight-line selection."""
+    if (row, col) in path:
+        return False
+    if not path:
+        return True
+    pr, pc = path[-1]
+    dr, dc = row - pr, col - pc
+    if (dr, dc) not in LINE_DIRS:
+        return False
+    if len(path) == 1:
+        return True
+    odr, odc = path[-1][0] - path[-2][0], path[-1][1] - path[-2][1]
+    return (dr, dc) == (odr, odc)
+
+def match_placed(placed_words, remaining, path):
+    """Return the word text if path is exactly a remaining placed word."""
+    cells = tuple(path)
+    rev = tuple(reversed(path))
+    remaining_set = set(remaining)
+    for text, word_cells in placed_words:
+        if text not in remaining_set:
+            continue
+        if cells == word_cells or rev == word_cells:
+            return text
+    return None
+
+def draw_all(window, layout, grid, wordlist, category, path, found_cells,
+             status=None, hover=None):
+    maxy, maxx = layout['maxy'], layout['maxx']
+    try:
+        window.erase()
+        window.bkgd(' ', curses.color_pair(1))
+    except curses.error:
+        pass
+
+    hline_clip(window, 0, 0, ' ', maxx, curses.A_REVERSE)
+    addstr_clip(window, 0, 0, category.center(maxx, ' '), curses.A_REVERSE)
+    addstr_clip(window, 0, 0, " wordsearch", curses.A_REVERSE)
+    scoretext = "Score: " + str(score)
+    addstr_clip(window, 0, max(0, maxx - len(scoretext) - 1), scoretext,
+                curses.A_REVERSE)
+
+    try:
+        rectangle(window,
+                  layout['box_uly'], layout['box_ulx'],
+                  layout['box_lry'], layout['box_lrx'])
+    except curses.error:
+        pass
+
+    path_set = set(path)
+    for irow in range(nrows):
+        for icol in range(ncols):
+            y, x = cell_to_yx(layout, irow, icol)
+            letter = grid[irow][icol]
+            attr = 0
+            if (irow, icol) in found_cells or (irow, icol) in path_set:
+                attr |= curses.A_REVERSE
+            if hover == (irow, icol):
+                attr |= curses.A_BOLD
+            addstr_clip(window, y, x, letter, attr)
+
+    if status:
+        lines = textwrap.wrap(status, max(1, maxx)) or [status]
+    else:
+        wordlistdisp = listToString(wordlist)
+        lines = textwrap.wrap(wordlistdisp, max(1, maxx)) or ['']
+    wy = layout['wordlist_y']
+    for i, line in enumerate(lines):
+        if wy + i >= layout['footer_y']:
+            break
+        addstr_clip(window, wy + i, 0, line.center(maxx, ' '))
+
+    if layout['show_preview'] and path:
+        addstr_clip(window, layout['preview_y'], layout['preview_x'],
+                    path_letters(grid, path))
+
+    helptext = HELP_LONG if maxx >= len(HELP_LONG) + 1 else HELP_SHORT
+    addstr_clip(window, layout['footer_y'], 0, helptext)
+
+def place_cursor(window, layout, row, col):
+    y, x = cell_to_yx(layout, row, col)
+    try:
+        window.move(y, x)
+    except curses.error:
+        pass
+
+def relayout(window, row, col):
+    """Recompute layout for the current size; clamp the cell cursor."""
+    maxy, maxx = window.getmaxyx()
+    layout = compute_layout(maxy, maxx)
+    row = min(max(0, row), nrows - 1)
+    col = min(max(0, col), ncols - 1)
+    return layout, row, col
 
 def scoreWrite():
   HighscoreList = []
@@ -285,7 +698,7 @@ def scoreWrite():
 
   # Add high score to the score list
   HighscoreList.append((username, score, datestr))
-  
+
   # Sort the score list by score and identify 10 scores
   HighscoreList = sorted(HighscoreList, key=itemgetter(1), reverse=True)[:10]
 
@@ -311,246 +724,174 @@ def scoreList():
   except: pass
   exit()
 
+def play_puzzle(window):
+    global score
+
+    mask = None
+    max_word_len = max(nrows, ncols)
+
+    if not wait_for_size(window):
+        return 'quit'
+
+    wordlist_filename = puzzlepicker()
+    wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
+                      reverse=True)
+
+    if max(len(word) for word in wordlist) > max_word_len:
+        raise ValueError('Word list contains a word with too many letters.'
+                         'The maximum is {}'.format(max(nrows, ncols)))
+
+    allow_backwards_words = False
+    grid, solution, placed_words = make_wordsearch(
+        nrows, ncols, wordlist, allow_backwards_words, mask)
+    if not grid:
+        return 'quit'
+
+    remaining = list(wordlist)
+    path = []
+    found_cells = set()
+    category = os.path.splitext(os.path.basename(wordlist_filename))[0]
+    row, col = nrows // 2, ncols // 2
+    status = None
+    hover = None
+
+    def paint():
+        draw_all(window, layout, grid, remaining, category, path,
+                 found_cells, status, hover)
+        place_cursor(window, layout, row, col)
+        window.refresh()
+
+    def wait_for_next_game():
+        nonlocal layout, row, col
+        while True:
+            nxt = read_key(window)
+            if nxt == curses.KEY_RESIZE:
+                if not wait_for_size(window):
+                    return 'quit'
+                layout, row, col = relayout(window, row, col)
+                paint()
+                continue
+            if nxt in (curses.ERR,):
+                continue
+            if isinstance(nxt, tuple) and nxt and nxt[0] == 'mouse':
+                if nxt[3] == 'press' and nxt[4] == 1:
+                    return 'next'
+                continue
+            if nxt in (ord('q'), ord('Q'), 27):
+                return 'quit'
+            return 'next'
+
+    def select_cell(at_row, at_col, ignore_duplicate=False):
+        """Add a cell to the current path. Returns 'next'/'quit' on a win."""
+        global score
+        nonlocal path, remaining, found_cells, status, row, col, layout
+        row, col = at_row, at_col
+        if ignore_duplicate and path and path[-1] == (at_row, at_col):
+            return None
+        if not path_is_step(path, at_row, at_col):
+            curses.beep()
+            return None
+        path.append((at_row, at_col))
+        matched = match_placed(placed_words, remaining, path)
+        if matched:
+            score += len(matched)
+            remaining.remove(matched)
+            found_cells.update(path)
+            path = []
+            if not remaining:
+                status = "Congratulations! Press any key for a new game."
+                layout, row, col = relayout(window, row, col)
+                paint()
+                return wait_for_next_game()
+        return None
+
+    def handle_mouse(event):
+        nonlocal row, col, hover
+        _tag, mx, my, kind, button = event
+        cell = yx_to_cell(layout, my, mx)
+        if cell is not None and kind == 'press' and button == 1:
+            hover = cell
+            return select_cell(cell[0], cell[1], ignore_duplicate=True)
+        if cell != hover:
+            hover = cell
+            if cell is not None:
+                row, col = cell
+        return None
+
+    layout, row, col = relayout(window, row, col)
+    paint()
+
+    while True:
+        key = read_key(window)
+
+        if key in (curses.ERR,):
+            continue
+
+        if key in (ord('q'), ord('Q'), 27):
+            return 'quit'
+
+        if key == curses.KEY_RESIZE or key == 12:  # Ctrl-L redraw
+            if not wait_for_size(window):
+                return 'quit'
+            layout, row, col = relayout(window, row, col)
+            paint()
+            continue
+
+        if isinstance(key, tuple) and key and key[0] == 'mouse':
+            outcome = handle_mouse(key)
+            if outcome:
+                return outcome
+            paint()
+            continue
+
+        if key in (curses.KEY_UP, ord('k'), ord('K')):
+            if row > 0:
+                row -= 1
+            else:
+                curses.beep()
+        elif key in (curses.KEY_DOWN, ord('j'), ord('J')):
+            if row < nrows - 1:
+                row += 1
+            else:
+                curses.beep()
+        elif key in (curses.KEY_LEFT, ord('h'), ord('H')):
+            if col > 0:
+                col -= 1
+            else:
+                curses.beep()
+        elif key in (curses.KEY_RIGHT, ord('l'), ord('L')):
+            if col < ncols - 1:
+                col += 1
+            else:
+                curses.beep()
+        elif key in (curses.KEY_HOME,):
+            row, col = 0, 0
+        elif key in (curses.KEY_END,):
+            row, col = nrows - 1, ncols - 1
+        elif key in (10, 13, getattr(curses, 'KEY_ENTER', 10)):
+            path = []
+            status = None
+            paint()
+            continue
+        elif key == ord(' '):
+            outcome = select_cell(row, col)
+            if outcome:
+                return outcome
+            paint()
+            continue
+        else:
+            place_cursor(window, layout, row, col)
+            continue
+
+        place_cursor(window, layout, row, col)
+        window.refresh()
+
 def Main(window):
-  mask = None
-  max_word_len = max(nrows, ncols)
-  scoreword = ''
-  global score
-
-  check_size(window) 
-  wordlist_filename = puzzlepicker()
-
-  wordlist = sorted(get_wordlist(wordlist_filename), key=lambda w: len(w),
-                  reverse=True)
- 
-  if max(len(word) for word in wordlist) > max_word_len:
-    raise ValueError('Word list contains a word with too many letters.'
-                     'The maximum is {}'.format(max(nrows, ncols)))
-
-  allow_backwards_words = False
-  grid, solution = make_wordsearch(nrows, ncols, wordlist, allow_backwards_words,
-                                 mask)
-  
-  width = 80
-  height = 24
-
-  # Set up coordinates to track scoring and completed words
-  adjacent = 0
-  duplicate = 0
-  ScoreList = []
-  CompletedList = []
-
-  # Initialize curses. If we can't set cursor modes, continue
-  try:
-    curses.curs_set(2)
-  except: pass
-
-  # Theme picker. If we can't set color modes, continue
-  try:
-    if (theme == "green"):
-      curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    if (theme == "black"):
-      curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
-    if (theme == "red"):
-      curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
-    if (theme == "blue"):
-      curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
-    if (theme == "purple"):
-      curses.init_pair(1, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-    if not theme:
-      curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
-    window.bkgd(' ', curses.color_pair(1))
-  except: pass
-
-  # Render background UX
-  window.hline(0, 0, " ", width, curses.A_REVERSE)
-  category = (os.path.basename(wordlist_filename)).replace(".txt", "")
-  window.addstr(0, 0, category.center(width, ' '), curses.A_REVERSE)
-  window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
-
-  # Render new score
-  scoretext = "Score: " + str(score)
-  sx = width - 9
-  sx = sx - len(str(score))
-  window.addstr(0, sx, scoretext, curses.A_REVERSE)
-
-  # Draw search box
-  rectangle(window, 2, 24, 18, 54)
- 
-  # Render word search surface
-  startrow = 3
-  startcol = 25
-
-  for irow in range(nrows):
-    puzrow = ' '.join(grid[irow])
-    window.addstr(startrow, startcol, puzrow);
-    startrow = startrow + 1
- 
-  # Render word hint list
-  wordlistdisp = listToString(wordlist)
-  window.addstr(20, 0, wordlistdisp.center(width, ' '))
-
-  # Render navigational directions
-  window.addstr(23, 0, "Arrow keys to navigate. Space: Select, Return: Clear, Q: Quit")
-
-  # Move on to puzzle surface
-  window.move(10, 37)
- 
-  # Main event loop 
-  key = window.getch()
-  while True:
-    if key == ord('q'):
-      curses.endwin()
-      scoreWrite()
-      scoreList()
-      exit()
- 
-    if key == curses.KEY_UP or key == ord('k'):
-      cy, cx = curses.getsyx()
-      if not cy < 4:
-        try:
-          window.move(cy-1, cx)
-        except:
-          curses.beep()
-          window.refresh()
-    elif key == curses.KEY_DOWN or key == ord('j'):
-      cy, cx = curses.getsyx()
-      if not cy > 16:
-        try:
-          window.move(cy+1, cx)
-        except:
-          curses.beep()
-          window.refresh()
-    elif key == curses.KEY_LEFT or key == ord('h'):
-      cy, cx = curses.getsyx()
-      if not cx < 27:
-        try:
-          window.move(cy, cx-2)
-        except:
-          curses.beep()
-          window.refresh()
-    elif key == curses.KEY_RIGHT or key == ord('l'):
-      cy, cx = curses.getsyx()
-      if not cx > 52:
-        try:
-          window.move(cy, cx+2)
-        except:
-          curses.beep()
-          window.refresh()
-    elif key == curses.KEY_RESIZE:
-      maxy, maxx = window.getmaxyx() 
-      window.resize(maxy, maxx)
-      window.clear()
-      window.bkgd(' ', curses.color_pair(1))
-      window.hline(0, 0, " ", maxx, curses.A_REVERSE)
-      category = (os.path.basename(wordlist_filename)).replace(".txt", "")
-      window.addstr(0, 0, category.center(width, ' '), curses.A_REVERSE)
-      window.addstr(0, 0, " wordsearch", curses.A_REVERSE)
-      scoretext = "Score: " + str(score)
-      sx = maxx - 9
-      sx = sx - len(str(score))
-      window.addstr(0, sx, scoretext, curses.A_REVERSE)
-      wordlistdisp = listToString(wordlist)
-      window.addstr(20, 0, wordlistdisp.center(maxx, ' '))
-      window.addstr(maxy-1, 0, "Arrow keys to navigate. Space: Select, Return: Clear, Q: Quit")
-      window.move(10, 37)
-      window.refresh()
-
-    # Return to wipe
-    elif key == 10:
-      cy, cx = curses.getsyx()
-
-      # Check scored coordinates to make sure we dont wipe completed items
-      for cord in ScoreList:
-       if cord not in CompletedList: 
-          wipeint = window.inch(cord[0], cord[1])
-          wipechar = wipeint & 0xFF
-          window.addch(cord[0], cord[1], wipechar)
-
-      # Clear scoreword and ScoreList to start over
-      ScoreList.clear()
-      window.addstr(10, 60, "                 ")
-      scoreword = ''
-
-      window.move(cy, cx)  
-
-    # Space to score
-    elif key == ord(' '):    # space bar
-      cy, cx = curses.getsyx()			# get y/x
-      cur = [cy, cx]
-      cur2 = (cy, cx)
-      duplicate = 0
-
-      # Check for existing ScoreList, then check if we are y +/- 1, or x +/- 2 away
-      if ScoreList:
-        # Get list of adjacencies
-        res = list(adjac(ScoreList[-1]))
-        
-        for member in res:
-          if cur in res:
-              adjacent = 1
-          else:
-              adjacent = 0
-              curses.beep()
-              curses.beep()
-              curses.beep()
-      else:
-        adjacent = 1
-
-      # Check for existing ScoreList, then check if this character is in it already
-      if ScoreList:
-        if cur2 in ScoreList:
-          curses.beep()
-          duplicate = 1
-
-      if adjacent == 1 and not duplicate == 1:
-        # Add coords for each letter we are adding
-        ScoreList.append((cy, cx))
-
-        # Find cursor and see if we have character match
-        scoreint = window.inch(cy, cx)
-        scorechar = scoreint & 0xFF
-        scoreword = ''.join([scoreword, chr(scorechar)])
-        window.addstr(10, 60, scoreword)
-
-        # Now let's check for a word match
-        for word in wordlist:
-          if (word == scoreword) or (word == scoreword[::-1]):
-            # Increase score based on number of chars
-            score = score + len(word)	
-
-            # Render new score
-            scoretext = "Score: " + str(score)
-            sx = width - 9
-            sx = sx - len(str(score))
-            window.addstr(0, sx, scoretext, curses.A_REVERSE)
-
-            # Reset settings for next word and clear buffer
-            window.addstr(10, 60, "                 ") 
-            scoreword = ''
-         
-            # Let's remember the coords for this set
-            CompletedList.append(ScoreList)
-  
-            # Reset the scoring list
-            ScoreList.clear()
- 
-            # Clear word from word list and redraw word list 
-            wordlist.remove(word)
-            wordlistdisp = listToString(wordlist)
-            window.addstr(20, 0, wordlistdisp.center(width, ' '))
-
-            # Did we win?
-            if not wordlist:
-              winstr = "Congratulations! Press any key for a new game."
-              window.addstr(20, 0, winstr.center(width, ' '))
-              key = window.getch()
-              Main(window)
-	
-        window.addstr(cy, cx, chr(scorechar), curses.A_REVERSE)	 # highlight char 
-        window.move(cy, cx)			# move back on board
-      
-    key = window.getch()
+    init_curses(window)
+    while True:
+        outcome = play_puzzle(window)
+        if outcome == 'quit':
+            return
 
 # Initalize wordsearch
 opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
@@ -567,8 +908,8 @@ if "-v" in opts:
   print("1. Redistributions of source code must retain the above copyright notice, this")
   print("   list of conditions and the following disclaimer.")
   print()
-  print("2. Redistributions in binary form must reproduce the above copyright notice,")
-  print("   this list of conditions and the following disclaimer in the documentation")
+  print("2. Redistributions in binary form must reproduce the above copyright notice, this")
+  print("   list of conditions and the following disclaimer in the documentation")
   print("   and/or other materials provided with the distribution.")
   print()
   exit()
@@ -584,5 +925,13 @@ if "-h" in opts:
 if "-t" in opts:
   theme = sys.argv[2]
 
+# Fast Escape in tmux/screen; must be set before initscr.
+os.environ.setdefault('ESCDELAY', '25')
+
 # Start curses and go to main
-curses.wrapper(Main)
+try:
+    curses.wrapper(Main)
+finally:
+    disable_mouse()
+scoreWrite()
+scoreList()
