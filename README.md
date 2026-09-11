@@ -19,7 +19,7 @@ Relax and find the words. There is no clock on the puzzle — score is the lengt
 Based on a printable word search generator by [Christian Hill](https://scipython.com).
 
 <p align="center">
-  <img width="780" alt="wordsearch in the terminal" src="https://user-images.githubusercontent.com/84298137/136885856-792937bd-da47-4b01-be29-f2cfca099ffd.png">
+  <img src="screenshots/wordsearch.png" width="640" alt="wordsearch running in the terminal">
 </p>
 
 ## Features
