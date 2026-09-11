@@ -761,14 +761,23 @@ def draw_highscore_screen(window, highscores, stats=None, current_entry=None):
         elapsed = 0
         if stats.get('t0') is not None:
             elapsed = time.monotonic() - stats['t0']
+        puzzles = stats.get('puzzles', 0)
+        words = stats.get('words', 0)
         lines = [
             "This session",
-            "  Score        {0}".format(score),
-            "  Words found  {0}".format(stats.get('words', 0)),
-            "  Puzzles      {0}".format(stats.get('puzzles', 0)),
-            "  Time played  {0}".format(format_duration(elapsed)),
-            "",
+            "  Score          {0}".format(score),
+            "  Words found    {0}".format(words),
+            "  Puzzles        {0}".format(puzzles),
+            "  Time played    {0}".format(format_duration(elapsed)),
         ]
+        if puzzles:
+            avg_score = score / float(puzzles)
+            avg_time = elapsed / float(puzzles)
+            lines.extend([
+                "  Average score  {0:.1f}".format(avg_score),
+                "  Average time   {0}".format(format_duration(avg_time)),
+            ])
+        lines.append("")
         for line in lines:
             if y >= maxy - 2:
                 break
