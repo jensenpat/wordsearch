@@ -13,13 +13,17 @@ The player will navigate using arrow keys to find the letters that make up each 
 
 Once each word has been completed, the player will receive a score equal to the number of letters of each word. With all words completed, the player wins the game for the named category.
 
-After finishing a category, the player will be prompted to begin a new category, or the player can choose to exit the game.
+After finishing a category, the completed puzzle stays on screen with every found letter highlighted so it can be read or screenshotted. Any key starts a new category; Q or Escape leaves the game.
+
+On exit, *wordsearch* records the session score if it is non-zero and shows a full-screen high score list plus this session's words found, score, puzzles finished, and time played. Time is not shown during play.
 
 *wordsearch* supports the following command line arguments to customize gameplay:
 
 	*-t <color>*    Set a curses color theme for game play: red, blue, green, purple and black
 
 	*-h*            Show wordsearch command line arguments
+
+	*-s*            Show the high score list (full-screen)
 
 	*-v*            Show wordsearch version
 

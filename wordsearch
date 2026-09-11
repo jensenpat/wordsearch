@@ -20,6 +20,7 @@
 
 import os
 import sys
+import time
 import random
 import curses
 import getpass
@@ -40,6 +41,12 @@ ncols = 15
 
 score = 0
 theme = ''
+HIGHSCORE_PATH = '/var/tmp/wsscore'
+session = {
+    'words': 0,
+    'puzzles': 0,
+    't0': None,
+}
 
 # Neighbors for a straight-line selection (8 directions).
 LINE_DIRS = (
@@ -50,6 +57,8 @@ LINE_DIRS = (
 
 HELP_LONG = "Arrows/hjkl/mouse: move  Space/click: select  Return: clear  Q/Esc: quit"
 HELP_SHORT = "hjkl/mouse  Space/click  Return  Q/Esc"
+HELP_WIN = "Puzzle complete  —  any key: next puzzle   Q/Esc: quit"
+HELP_SCORES = "Any key or click to return to the shell"
 
 # SGR + any-event tracking: iTerm and tmux pass hover (1003) and click (1006).
 MOUSE_TRACK_ON = b'\033[?1000h\033[?1002h\033[?1003h\033[?1006h'
@@ -610,8 +619,17 @@ def match_placed(placed_words, remaining, path):
             return text
     return None
 
+def set_cursor_visible(on):
+    try:
+        curses.curs_set(2 if on else 0)
+    except curses.error:
+        try:
+            curses.curs_set(1 if on else 0)
+        except curses.error:
+            pass
+
 def draw_all(window, layout, grid, wordlist, category, path, found_cells,
-             status=None, hover=None):
+             status=None, hover=None, last_word=None, helptext=None):
     maxy, maxx = layout['maxy'], layout['maxx']
     try:
         window.erase()
@@ -641,6 +659,8 @@ def draw_all(window, layout, grid, wordlist, category, path, found_cells,
             attr = 0
             if (irow, icol) in found_cells or (irow, icol) in path_set:
                 attr |= curses.A_REVERSE
+            if last_word and (irow, icol) in last_word:
+                attr |= curses.A_BOLD
             if hover == (irow, icol):
                 attr |= curses.A_BOLD
             addstr_clip(window, y, x, letter, attr)
@@ -660,7 +680,8 @@ def draw_all(window, layout, grid, wordlist, category, path, found_cells,
         addstr_clip(window, layout['preview_y'], layout['preview_x'],
                     path_letters(grid, path))
 
-    helptext = HELP_LONG if maxx >= len(HELP_LONG) + 1 else HELP_SHORT
+    if helptext is None:
+        helptext = HELP_LONG if maxx >= len(HELP_LONG) + 1 else HELP_SHORT
     addstr_clip(window, layout['footer_y'], 0, helptext)
 
 def place_cursor(window, layout, row, col):
@@ -678,51 +699,143 @@ def relayout(window, row, col):
     col = min(max(0, col), ncols - 1)
     return layout, row, col
 
+def load_highscores():
+    try:
+        with open(HIGHSCORE_PATH, 'rb') as Highscorefile:
+            data = pickle.load(Highscorefile)
+        if not isinstance(data, list):
+            return []
+        return data
+    except Exception:
+        return []
+
+def save_highscores(highscores):
+    with open(HIGHSCORE_PATH, 'wb') as Highscorefile:
+        pickle.dump(highscores, Highscorefile)
+
+def record_score():
+    """Append this session's score and keep the top 10. Does not exit."""
+    highscores = load_highscores()
+    if score == 0:
+        return highscores, None
+    username = getpass.getuser()
+    today = date.today()
+    datestr = f"{today.month}/{today.day}/{today.year}"
+    entry = (username, score, datestr)
+    highscores.append(entry)
+    highscores = sorted(highscores, key=itemgetter(1), reverse=True)[:10]
+    try:
+        save_highscores(highscores)
+    except Exception:
+        pass
+    return highscores, entry
+
+def format_duration(seconds):
+    total = max(0, int(seconds))
+    hours, rem = divmod(total, 3600)
+    minutes, secs = divmod(rem, 60)
+    if hours:
+        return "{0}:{1:02d}:{2:02d}".format(hours, minutes, secs)
+    return "{0}:{1:02d}".format(minutes, secs)
+
+def draw_highscore_screen(window, highscores, stats=None, current_entry=None):
+    """Full-screen session summary and top-10 list."""
+    try:
+        maxy, maxx = window.getmaxyx()
+    except curses.error:
+        return
+    try:
+        window.erase()
+        window.bkgd(' ', curses.color_pair(1))
+    except curses.error:
+        pass
+
+    hline_clip(window, 0, 0, ' ', maxx, curses.A_REVERSE)
+    addstr_clip(window, 0, 0, " wordsearch".ljust(maxx), curses.A_REVERSE)
+    title = "High Scores"
+    addstr_clip(window, 0, max(0, (maxx - len(title)) // 2), title,
+                curses.A_REVERSE)
+
+    y = 2
+    if stats is not None:
+        elapsed = 0
+        if stats.get('t0') is not None:
+            elapsed = time.monotonic() - stats['t0']
+        lines = [
+            "This session",
+            "  Score        {0}".format(score),
+            "  Words found  {0}".format(stats.get('words', 0)),
+            "  Puzzles      {0}".format(stats.get('puzzles', 0)),
+            "  Time played  {0}".format(format_duration(elapsed)),
+            "",
+        ]
+        for line in lines:
+            if y >= maxy - 2:
+                break
+            addstr_clip(window, y, 2, line)
+            y += 1
+
+    headers = "{0:>4}  {1:<16}  {2:>8}  {3}".format(
+        "#", "Player", "Score", "Date")
+    addstr_clip(window, y, 2, headers, curses.A_UNDERLINE)
+    y += 1
+    if not highscores:
+        addstr_clip(window, y, 2, "No scores yet.")
+    else:
+        for i, entry in enumerate(highscores[:10], 1):
+            if y >= maxy - 2:
+                break
+            name, pts, when = entry[0], entry[1], entry[2]
+            row = "{0:>4}  {1:<16}  {2:>8}  {3}".format(
+                i, str(name)[:16], pts, when)
+            attr = 0
+            if current_entry is not None and tuple(entry) == tuple(current_entry):
+                attr = curses.A_REVERSE
+            addstr_clip(window, y, 2, row, attr)
+            y += 1
+
+    addstr_clip(window, maxy - 1, 0, HELP_SCORES)
+
+def highscore_display(window, stats=None, record=True):
+    """Show the full-screen high-score list. Used on quit and by -s."""
+    set_cursor_visible(False)
+    current_entry = None
+    if record:
+        highscores, current_entry = record_score()
+    else:
+        highscores = load_highscores()
+
+    while True:
+        draw_highscore_screen(window, highscores, stats, current_entry)
+        try:
+            window.refresh()
+        except curses.error:
+            pass
+        key = read_key(window)
+        if key == curses.KEY_RESIZE:
+            continue
+        if key in (curses.ERR,):
+            continue
+        if isinstance(key, tuple) and key and key[0] == 'mouse':
+            if key[3] == 'press' and key[4] == 1:
+                return
+            continue
+        return
+
 def scoreWrite():
-  HighscoreList = []
-
-  # No need to write a score if we didn't play a game
-  if (score == 0):
-    return()
-
-  # Capture user and score details
-  username = getpass.getuser()
-  today = date.today()
-  datestr = f"{today.month}/{today.day}/{today.year}"
-
-  # Open the high score if available
-  try:
-    with open('/var/tmp/wsscore', 'rb') as Highscorefile:
-      HighscoreList = pickle.load(Highscorefile)
-  except: pass
-
-  # Add high score to the score list
-  HighscoreList.append((username, score, datestr))
-
-  # Sort the score list by score and identify 10 scores
-  HighscoreList = sorted(HighscoreList, key=itemgetter(1), reverse=True)[:10]
-
-  # Write the last 10 scores to disk
-  with open('/var/tmp/wsscore', 'wb') as Highscorefile:
-    pickle.dump(HighscoreList, Highscorefile)
-    exit()
+    record_score()
 
 def scoreList():
-  HighscoreList = []
-
-  try:
-    with open('/var/tmp/wsscore', 'rb') as Highscorefile:
-      HighscoreList = pickle.load(Highscorefile)
-
+    """Command-line / leftover stdout listing (kept for callers)."""
+    highscores = load_highscores()
+    if not highscores:
+        return
     print("wordsearch")
     print("High Scores")
     print()
     print("Username	Score		Date")
-
-    for a in HighscoreList:
-      print(a[0]+"		"+str(a[1])+"		"+a[2])
-  except: pass
-  exit()
+    for a in highscores:
+        print(a[0] + "		" + str(a[1]) + "		" + a[2])
 
 def play_puzzle(window):
     global score
@@ -750,19 +863,26 @@ def play_puzzle(window):
     remaining = list(wordlist)
     path = []
     found_cells = set()
+    last_word = set()
     category = os.path.splitext(os.path.basename(wordlist_filename))[0]
     row, col = nrows // 2, ncols // 2
     status = None
     hover = None
+    complete = False
 
     def paint():
         draw_all(window, layout, grid, remaining, category, path,
-                 found_cells, status, hover)
-        place_cursor(window, layout, row, col)
+                 found_cells, status, hover, last_word,
+                 helptext=HELP_WIN if complete else None)
+        if complete:
+            set_cursor_visible(False)
+        else:
+            place_cursor(window, layout, row, col)
         window.refresh()
 
     def wait_for_next_game():
         nonlocal layout, row, col
+        set_cursor_visible(False)
         while True:
             nxt = read_key(window)
             if nxt == curses.KEY_RESIZE:
@@ -775,16 +895,19 @@ def play_puzzle(window):
                 continue
             if isinstance(nxt, tuple) and nxt and nxt[0] == 'mouse':
                 if nxt[3] == 'press' and nxt[4] == 1:
+                    set_cursor_visible(True)
                     return 'next'
                 continue
             if nxt in (ord('q'), ord('Q'), 27):
                 return 'quit'
+            set_cursor_visible(True)
             return 'next'
 
     def select_cell(at_row, at_col, ignore_duplicate=False):
         """Add a cell to the current path. Returns 'next'/'quit' on a win."""
         global score
         nonlocal path, remaining, found_cells, status, row, col, layout
+        nonlocal last_word, complete
         row, col = at_row, at_col
         if ignore_duplicate and path and path[-1] == (at_row, at_col):
             return None
@@ -796,10 +919,14 @@ def play_puzzle(window):
         if matched:
             score += len(matched)
             remaining.remove(matched)
+            last_word = set(path)
             found_cells.update(path)
             path = []
+            session['words'] += 1
             if not remaining:
-                status = "Congratulations! Press any key for a new game."
+                complete = True
+                session['puzzles'] += 1
+                status = "Congratulations!  {0} complete.".format(category)
                 layout, row, col = relayout(window, row, col)
                 paint()
                 return wait_for_next_game()
@@ -888,9 +1015,12 @@ def play_puzzle(window):
 
 def Main(window):
     init_curses(window)
+    if session['t0'] is None:
+        session['t0'] = time.monotonic()
     while True:
         outcome = play_puzzle(window)
         if outcome == 'quit':
+            highscore_display(window, stats=session, record=True)
             return
 
 # Initalize wordsearch
@@ -915,7 +1045,11 @@ if "-v" in opts:
   exit()
 
 if "-s" in opts:
-  scoreList()
+  os.environ.setdefault('ESCDELAY', '25')
+  try:
+      curses.wrapper(lambda w: (init_curses(w), highscore_display(w, record=False)))
+  finally:
+      disable_mouse()
   exit()
 
 if "-h" in opts:
@@ -933,5 +1067,3 @@ try:
     curses.wrapper(Main)
 finally:
     disable_mouse()
-scoreWrite()
-scoreList()
